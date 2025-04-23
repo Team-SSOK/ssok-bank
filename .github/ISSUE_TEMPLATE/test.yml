@@ -1,0 +1,32 @@
+name: "Test"
+description: "테스트 시나리오 및 체크리스트 작성"
+title: "test: "
+labels: ["test"]
+assignees: []
+body:
+  - type: textarea
+    attributes:
+      label: "🧪 테스트 항목"
+      description: "테스트할 내용을 체크리스트로 작성해주세요."
+      placeholder: |
+        - [ ] 로그인 기능 정상 동작 확인
+        - [ ] 비밀번호 재설정 이메일 발송 여부
+        - [ ] 404 페이지 연결 확인
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: "📄 테스트 목적"
+      description: "왜 이 테스트를 수행하는지 설명해주세요."
+      placeholder: "신규 기능 릴리스 전 확인 / 버그 수정 확인 등"
+    validations:
+      required: false
+
+  - type: textarea
+    attributes:
+      label: "📋 참고 사항"
+      description: "기타 테스트 시 참고할 내용이 있다면 적어주세요."
+      placeholder: "ex) 특정 계정으로만 테스트 가능 / 테스트용 API Key"
+    validations:
+      required: false

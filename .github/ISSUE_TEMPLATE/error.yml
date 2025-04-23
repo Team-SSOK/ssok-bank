@@ -1,0 +1,40 @@
+name: "Error"
+description: "버그 리포트 또는 에러 제보"
+title: "error:  "
+labels: ["bug"]
+assignees: []
+body:
+  - type: textarea
+    attributes:
+      label: "📄 버그 설명"
+      description: "어떤 문제가 발생했는지 명확하게 작성해 주세요."
+      placeholder: "무슨 상황에서 에러가 발생했는지 자세히 적어주세요."
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: "🧪 재현 방법"
+      description: "버그를 재현할 수 있는 절차를 단계별로 설명해주세요."
+      placeholder: |
+        1. 어떤 페이지에 접속하고
+        2. 어떤 버튼을 눌렀더니
+        3. 이런 에러가 났다
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: "📷 스크린샷 / 에러 로그"
+      description: "관련 이미지나 에러 로그가 있다면 첨부해주세요."
+      placeholder: "에러 메시지, 콘솔 로그, 캡처 이미지 등"
+    validations:
+      required: false
+
+  - type: textarea
+    attributes:
+      label: "💻 환경 정보"
+      description: "사용한 브라우저, OS, 기기 정보 등을 적어주세요."
+      placeholder: "ex) Chrome 120 / macOS / iPhone 13 등"
+    validations:
+      required: false
