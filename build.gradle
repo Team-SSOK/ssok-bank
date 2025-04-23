@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'kr.ssok'
-version = '0.0.1-SNAPSHOT'
+version = '1.0-SNAPSHOT'
 
 java {
     toolchain {
@@ -24,14 +24,42 @@ repositories {
 }
 
 dependencies {
+    // validation
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+    // jpa
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+
+    // spring security, web
     implementation 'org.springframework.boot:spring-boot-starter-security'
-    implementation 'org.springframework.boot:spring-boot-starter-web'
-    compileOnly 'org.projectlombok:lombok'
-    developmentOnly 'org.springframework.boot:spring-boot-devtools'
-    annotationProcessor 'org.projectlombok:lombok'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+
+    // lombok
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+
+    // mariaDB
+    runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
+
+    // boot
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    // JWT 의존성
+    implementation group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.12.6'
+    runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.12.6'
+    runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.12.6'
+
+    // Spring Cloud 의존성 관리 (버전 관리용)
+    implementation 'org.springframework.cloud:spring-cloud-dependencies:2024.0.0' // 최신 버전 확인 필요
+
+    // 스웨거 문서작성을 위한 어노테이션
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
+
+    // Spring Boot 액추에이터 스타터 (옵션, 모니터링 용도)
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'io.micrometer:micrometer-registry-prometheus'
 }
 
 tasks.named('test') {

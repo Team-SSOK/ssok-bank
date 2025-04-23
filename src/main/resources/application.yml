@@ -1,0 +1,21 @@
+spring:
+  application:
+    name: ssok-bank
+
+  jpa:
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: Asia/Seoul
+        use_sql_comments: 'true'
+        format_sql: 'true'
+        show_sql: 'true'
+    hibernate:
+      ddl-auto: update
+
+  datasource:
+    username: lgcns
+    password: password
+    url: jdbc:mariadb://kudong.kr:55023/springbootdb?useUnicode=true&characterEncoding=utf-8&serverTimeZone=Asia/Seoul
+    driver-class-name: org.mariadb.jdbc.Driver
+
