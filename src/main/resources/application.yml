@@ -16,6 +16,6 @@ spring:
   datasource:
     username: lgcns
     password: password
-    url: jdbc:mariadb://kudong.kr:55023/springbootdb?useUnicode=true&characterEncoding=utf-8&serverTimeZone=Asia/Seoul
+    url: jdbc:mariadb://kudong.kr:55023/moni?useUnicode=true&characterEncoding=utf-8&serverTimeZone=Asia/Seoul
     driver-class-name: org.mariadb.jdbc.Driver
 
