@@ -5,6 +5,7 @@ import kr.ssok.bank.common.constant.BankCode;
 import kr.ssok.bank.common.entity.TimeStamp;
 import kr.ssok.bank.domain.user.entity.User;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -49,6 +50,7 @@ public class Account extends TimeStamp {
         return date.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
     }
 
+    @Setter
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
