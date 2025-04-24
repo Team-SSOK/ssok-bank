@@ -15,7 +15,6 @@ import java.util.Date;
 import java.util.List;
 
 @Entity
-@Table(name = "bank_users")
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
@@ -37,8 +36,8 @@ public class User extends TimeStamp {
     private Long dailyTransactionTotal = 0L;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "user_type", nullable = false)
-    private UserType userType;
+    @Column(name = "user_type_code", nullable = false)
+    private UserTypeCode userTypeCode;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Account> accounts = new ArrayList<>();

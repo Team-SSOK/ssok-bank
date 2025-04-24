@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public enum UserType {
+public enum UserTypeCode {
 
     //개인
     INDIVIDUAL(1,"INDIVIDUAL"),
