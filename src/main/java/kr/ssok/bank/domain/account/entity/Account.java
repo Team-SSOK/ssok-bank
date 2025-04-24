@@ -16,8 +16,7 @@ import java.util.Date;
 
 @Entity
 @Getter
-@Setter
-//@Builder
+@Builder
 public class Account extends TimeStamp {
 
     @Id

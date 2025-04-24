@@ -6,5 +6,5 @@ import kr.ssok.bank.domain.account.entity.Account;
 import kr.ssok.bank.domain.user.entity.User;
 
 public interface AccountService {
-    public Account createAccount(User user, BankCode bankCode, AccountTypeCode accountTypeCode);
+    public Account createAccount(User user, AccountTypeCode accountTypeCode);
 }

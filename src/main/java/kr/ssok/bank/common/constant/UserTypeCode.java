@@ -11,7 +11,7 @@ public enum UserTypeCode {
     INDIVIDUAL(1,"INDIVIDUAL"),
     //사업자
     BUSINESS_OWNER(2,"BUSINESS_OWNER"),
-    //기업
+    //법인
     CORPORATION(3,"CORPORATION");
 
     private final int idx;

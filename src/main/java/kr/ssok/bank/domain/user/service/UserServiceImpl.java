@@ -1,7 +1,7 @@
 package kr.ssok.bank.domain.user.service;
 
 import kr.ssok.bank.common.exception.BaseException;
-import kr.ssok.bank.common.response.code.status.ErrorStatus;
+import kr.ssok.bank.common.response.code.status.ErrorStatusCode;
 import kr.ssok.bank.domain.user.dto.UserRequestDTO;
 import kr.ssok.bank.domain.user.entity.User;
 import kr.ssok.bank.domain.user.repository.UserRepository;
@@ -25,7 +25,7 @@ public class UserServiceImpl implements UserService{
     public void createUser(UserRequestDTO userDto) throws BaseException {
 
         this.userRepository.findByUsername(userDto.getUsername()).ifPresent(user -> {
-            throw new BaseException(ErrorStatus.USER_ALREADY_EXISTS);
+            throw new BaseException(ErrorStatusCode.USER_ALREADY_EXISTS);
         });
 
         User user = User.builder().username(userDto.getUsername())
