@@ -5,12 +5,15 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public enum BankCode {
-    //쏙뱅크
-    SSOK_BANK(1,"SSOK_BANK"),
+public enum AccountTypeCode {
+    // 예금
+    DEPOSIT(1, "예금"),
 
-    //카카오뱅크
-    KAKAO_BANK(2,"KAKAO_BANK");
+    // 적금
+    SAVINGS(2, "적금"),
+
+    // 청약
+    SUBSCRIPTION(3, "청약");
 
     private final int idx;
     private final String value;

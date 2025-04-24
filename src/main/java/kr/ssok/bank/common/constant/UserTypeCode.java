@@ -1,4 +1,4 @@
-package kr.ssok.bank.domain.user.entity;
+package kr.ssok.bank.common.constant;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

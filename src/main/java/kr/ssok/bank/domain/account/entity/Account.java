@@ -1,9 +1,12 @@
 package kr.ssok.bank.domain.account.entity;
 
 import jakarta.persistence.*;
+import kr.ssok.bank.common.constant.AccountStatusCode;
+import kr.ssok.bank.common.constant.AccountTypeCode;
 import kr.ssok.bank.common.constant.BankCode;
 import kr.ssok.bank.common.entity.TimeStamp;
 import kr.ssok.bank.domain.user.entity.User;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,11 +16,18 @@ import java.util.Date;
 
 @Entity
 @Getter
+@Setter
+//@Builder
 public class Account extends TimeStamp {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long accountId;
+
+    //계좌 유형 코드
+    @Enumerated(EnumType.STRING)
+    @Column(name = "account_type_code", nullable = false)
+    private AccountTypeCode accountTypeCode;
 
     //계좌번호
     @Column(name = "account_number" , nullable = false, unique = true)
@@ -35,16 +45,11 @@ public class Account extends TimeStamp {
     //계좌 상태 코드
     @Enumerated(EnumType.STRING)
     @Column(name = "account_status_code", nullable = false)
-    private BankCode accountStatusCode;
+    private AccountStatusCode accountStatusCode;
 
     //출금 한도
     @Column(name = "withdraw_limit" , nullable = false)
     private Long withdrawLimit;
-
-    //계좌 유형 코드
-    @Enumerated(EnumType.STRING)
-    @Column(name = "account_type_code", nullable = false)
-    private BankCode accountTypeCode;
 
     private LocalDateTime convertToLocalDateTime(Date date) {
         return date.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();

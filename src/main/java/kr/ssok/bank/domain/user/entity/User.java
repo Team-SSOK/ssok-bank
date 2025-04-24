@@ -1,6 +1,7 @@
 package kr.ssok.bank.domain.user.entity;
 
 import jakarta.persistence.*;
+import kr.ssok.bank.common.constant.UserTypeCode;
 import kr.ssok.bank.common.entity.TimeStamp;
 import kr.ssok.bank.domain.account.entity.Account;
 import lombok.AllArgsConstructor;
