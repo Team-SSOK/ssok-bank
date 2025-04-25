@@ -4,7 +4,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletRequest;
 import kr.ssok.bank.common.exception.BaseException;
 import kr.ssok.bank.common.response.ApiResponse;
-import kr.ssok.bank.common.response.code.status.SuccessStatus;
 import kr.ssok.bank.domain.user.dto.UserRequestDTO;
 import kr.ssok.bank.domain.user.entity.User;
 import kr.ssok.bank.domain.user.service.UserService;
@@ -38,10 +37,10 @@ public class UserController {
     public ApiResponse<UserRequestDTO> createUser(@RequestBody UserRequestDTO userRequestDto, HttpServletRequest request) {
         try
         {
-            //SuccessStatus에서 ENUM 새로 정의 해야됨...
             User user = this.userService.createUser(userRequestDto);
-            return ApiResponse.of(SuccessStatus._OK,null);
-        } catch (BaseException e)
+            return ApiResponse.onSuccess("200", "사용자 생성에 성공하였습니다.", null);
+        }
+        catch (BaseException e)
         {
             return ApiResponse.onFailure("400", "사용자 생성에 실패하였습니다.", null);
         }

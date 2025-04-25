@@ -4,8 +4,7 @@ import kr.ssok.bank.common.constant.AccountStatusCode;
 import kr.ssok.bank.common.constant.AccountTypeCode;
 import kr.ssok.bank.common.constant.BankCode;
 import kr.ssok.bank.common.exception.BaseException;
-import kr.ssok.bank.common.response.code.status.ErrorStatusCode;
-import kr.ssok.bank.common.response.code.status.SuccessStatusCode;
+import kr.ssok.bank.common.constant.FailureStatusCode;
 import kr.ssok.bank.domain.account.dto.AccountResponseDTO;
 import kr.ssok.bank.domain.account.entity.Account;
 import kr.ssok.bank.domain.account.repository.AccountRepository;
@@ -62,7 +61,7 @@ public class AccountServiceImpl implements AccountService{
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> {
                     log.warn("사용자 정보 없음: username = {}", username);
-                    return new BaseException(ErrorStatusCode.USER_NOT_FOUND);
+                    return new BaseException(FailureStatusCode.USER_NOT_FOUND);
                 });
 
         // 사용자의 전체 계좌 조회

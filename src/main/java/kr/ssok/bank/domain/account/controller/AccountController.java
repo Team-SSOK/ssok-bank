@@ -1,10 +1,9 @@
 package kr.ssok.bank.domain.account.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
-import kr.ssok.bank.common.constant.BankCode;
 import kr.ssok.bank.common.constant.UserTypeCode;
 import kr.ssok.bank.common.response.ApiResponse;
-import kr.ssok.bank.common.response.code.status.ErrorStatusCode;
+import kr.ssok.bank.common.constant.FailureStatusCode;
 import kr.ssok.bank.domain.account.dto.AccountRequestDTO;
 import kr.ssok.bank.domain.account.dto.AccountResponseDTO;
 import kr.ssok.bank.domain.account.entity.Account;
@@ -61,7 +60,7 @@ public class AccountController {
                                     userTypeCode = UserTypeCode.valueOf(accountRequest.getUserTypeCode().name());
                                 } catch (IllegalArgumentException e) {
                                     log.error("Invalid user type: {}", accountRequest.getUserTypeCode(), e);
-                                    throw new BaseException(ErrorStatusCode.USER_TYPE_ERROR);
+                                    throw new BaseException(FailureStatusCode.USER_TYPE_ERROR);
                                 }
                             }
 
@@ -80,11 +79,11 @@ public class AccountController {
                                     accountRequest.getUsername(), accountRequest.getPhoneNumber()
                             ).orElseThrow(() -> {
                                 log.error("User not found after creation attempt: {} - {}", accountRequest.getUsername(), accountRequest.getPhoneNumber());
-                                throw new BaseException(ErrorStatusCode.USER_NOT_FOUND);
+                                throw new BaseException(FailureStatusCode.USER_NOT_FOUND);
                             });
                         } catch (Exception e) {
                             log.error("Failed to create user: {} - {}", accountRequest.getUsername(), accountRequest.getPhoneNumber(), e);
-                            throw new BaseException(ErrorStatusCode.USER_CREATION_FAILED);
+                            throw new BaseException(FailureStatusCode.USER_CREATION_FAILED);
                         }
                     });
 
@@ -106,7 +105,7 @@ public class AccountController {
             log.error("Unexpected error occurred: {}", e.getMessage(), e);
 
             // 서버 오류 응답
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ApiResponse.onFailure(ErrorStatusCode._INTERNAL_SERVER_ERROR.getCode(), "서버 오류가 발생했습니다. 나중에 다시 시도해주세요.", null));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ApiResponse.onFailure(FailureStatusCode._INTERNAL_SERVER_ERROR.getCode(), "서버 오류가 발생했습니다. 나중에 다시 시도해주세요.", null));
         }
     }
 

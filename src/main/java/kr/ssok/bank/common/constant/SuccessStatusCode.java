@@ -1,7 +1,7 @@
-package kr.ssok.bank.common.response.code.status;
+package kr.ssok.bank.common.constant;
 
-import kr.ssok.bank.common.response.code.BaseCode;
-import kr.ssok.bank.common.response.code.ReasonDTO;
+import kr.ssok.bank.common.response.BaseCode;
+import kr.ssok.bank.common.response.BaseResponseDTO;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
@@ -18,8 +18,8 @@ public enum SuccessStatusCode implements BaseCode {
     private final String message;
 
     @Override
-    public ReasonDTO getReason() {
-        return ReasonDTO.builder()
+    public BaseResponseDTO getReason() {
+        return BaseResponseDTO.builder()
                 .message(message)
                 .code(code)
                 .isSuccess(true)
@@ -27,8 +27,8 @@ public enum SuccessStatusCode implements BaseCode {
     }
 
     @Override
-    public ReasonDTO getReasonHttpStatus() {
-        return ReasonDTO.builder()
+    public BaseResponseDTO getReasonHttpStatus() {
+        return BaseResponseDTO.builder()
                 .message(message)
                 .code(code)
                 .isSuccess(true)
