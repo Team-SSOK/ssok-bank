@@ -10,5 +10,5 @@ import java.util.List;
 
 public interface AccountService {
     public Account createAccount(User user, AccountTypeCode accountTypeCode);
-    public List<AccountResponseDTO> getAccountsByUsername(String username);
+    public List<AccountResponseDTO> getAccountsByUsernameAndPhoneNumber(String username, String phoneNumber);
 }

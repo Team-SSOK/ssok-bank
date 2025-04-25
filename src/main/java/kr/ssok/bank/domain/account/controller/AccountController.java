@@ -111,17 +111,20 @@ public class AccountController {
 
     // 사용자 별 계좌 조회 API
     @GetMapping("/account")
-    public ResponseEntity<ApiResponse<List<AccountResponseDTO>>> getUserAccounts(@RequestParam String username) {
-        log.info("[GET] /account - 계좌 조회 요청: username = {}", username);
+    public ResponseEntity<ApiResponse<List<AccountResponseDTO>>> getUserAccounts(
+            @RequestParam String username,
+            @RequestParam String phoneNumber) {
+
+        log.info("[GET] /account - 계좌 조회 요청: username = {}, phoneNumber = {}", username, phoneNumber);
 
         try {
             // 1. 계좌 조회
-            List<AccountResponseDTO> response = accountService.getAccountsByUsername(username);
+            List<AccountResponseDTO> response = accountService.getAccountsByUsernameAndPhoneNumber(username, phoneNumber);
 
             // 1-1. 조회 결과 계좌가 없는 경우
             if (response.isEmpty()) {
-                log.warn("계좌 없음: username = {}", username);
-                return ResponseEntity.ok(ApiResponse.onSuccess(response)); // or return notFound?
+                log.warn("계좌 없음: username = {}, phoneNumber = {}", username, phoneNumber);
+                return ResponseEntity.ok(ApiResponse.onSuccess(response)); // 또는 notFound()도 가능
             }
 
             // 성공 응답
@@ -130,15 +133,14 @@ public class AccountController {
 
         } catch (BaseException e) {
             log.error("계좌 조회 실패: username = {}, 에러 = {}", username, e.getMessage());
-            
-            // 실패 응답
+
             return ResponseEntity
                     .status(e.getStatus().getHttpStatus())
                     .body(ApiResponse.onFailure(e.getStatus().getCode(), e.getStatus().getMessage(), null));
+
         } catch (Exception e) {
             log.error("계좌 조회 중 알 수 없는 오류 발생: username = {}, 에러 = {}", username, e.getMessage(), e);
-            
-            // 서버 오류 응답
+
             return ResponseEntity
                     .status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(ApiResponse.onFailure("INTERNAL500", "서버 내부 오류가 발생했습니다.", null));

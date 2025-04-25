@@ -54,13 +54,14 @@ public class AccountServiceImpl implements AccountService{
 
     // 사용자 별 계좌 조회 메서드
     @Override
-    public List<AccountResponseDTO> getAccountsByUsername(String username) {
-        log.info("계좌 조회 요청: username = {}", username);
+    public List<AccountResponseDTO> getAccountsByUsernameAndPhoneNumber(String username, String phoneNumber) {
+
+        log.info("계좌 조회 요청: username = {} , phoneNumber = {}", username, phoneNumber);
 
         // 사용자 조회
-        User user = userRepository.findByUsername(username)
+        User user = userRepository.findByUsernameAndPhoneNumber(username, phoneNumber)
                 .orElseThrow(() -> {
-                    log.warn("사용자 정보 없음: username = {}", username);
+                    log.warn("사용자 정보 없음: username = {}, phoneNumber = {}", username, phoneNumber);
                     return new BaseException(FailureStatusCode.USER_NOT_FOUND);
                 });
 
