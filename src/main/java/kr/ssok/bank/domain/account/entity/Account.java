@@ -46,6 +46,10 @@ public class Account extends TimeStamp {
     @Column(name = "account_status_code", nullable = false)
     private AccountStatusCode accountStatusCode;
 
+    public boolean isDormant() {
+        return this.accountStatusCode == AccountStatusCode.DORMANT;
+    }
+
     //출금 한도
     @Column(name = "withdraw_limit" , nullable = false)
     private Long withdrawLimit;
@@ -58,4 +62,5 @@ public class Account extends TimeStamp {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
+
 }

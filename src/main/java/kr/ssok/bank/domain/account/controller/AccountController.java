@@ -1,6 +1,7 @@
 package kr.ssok.bank.domain.account.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
+import kr.ssok.bank.common.constant.AccountStatusCode;
 import kr.ssok.bank.common.constant.SuccessStatusCode;
 import kr.ssok.bank.common.constant.UserTypeCode;
 import kr.ssok.bank.common.response.ApiResponse;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @RestController
@@ -135,11 +137,40 @@ public class AccountController {
         } catch (BaseException e) {
             log.error("계좌 조회 실패: username = {}, 에러 = {}", username, e.getMessage());
 
+            // 실패 응답
             return ApiResponse.of(FailureStatusCode.ACCOUNT_READ_FAILED, null);
 
         } catch (Exception e) {
             log.error("계좌 조회 중 알 수 없는 오류 발생: username = {}, 에러 = {}", username, e.getMessage(), e);
 
+            //서버 오류 응답
+            return ApiResponse.of(FailureStatusCode._INTERNAL_SERVER_ERROR, null);
+        }
+    }
+
+    // 휴면 계좌 여부 확인 API
+    @GetMapping("/account/dormant")
+    public ApiResponse<Map<String, Boolean>> checkDormantAccount(@RequestParam String accountNumber) {
+        log.info("[GET] /account/dormant - 휴면계좌 여부 확인 요청: accountNumber = {}", accountNumber);
+
+        try {
+            // 1. 휴면 계좌 여부 확인
+            boolean isDormant = accountService.isAccountDormant(accountNumber);
+
+            // 성공 응답
+            Map<String, Boolean> result = Map.of("isDormant", isDormant);
+            return ApiResponse.of(SuccessStatusCode.ACCOUNT_DORMANT_OK, result);
+
+        } catch (BaseException e) {
+            log.error("휴면계좌 조회 실패: accountNumber = {}, 에러 = {}", accountNumber, e.getMessage());
+
+            // 실패 응답
+            return ApiResponse.of(FailureStatusCode.ACCOUNT_DORMANT_FAILED, null);
+
+        } catch (Exception e) {
+            log.error("휴면계좌 조회 중 알 수 없는 오류 발생: accountNumber = {}, 에러 = {}", accountNumber, e.getMessage(), e);
+
+            // 서버 오류 응답
             return ApiResponse.of(FailureStatusCode._INTERNAL_SERVER_ERROR, null);
         }
     }
