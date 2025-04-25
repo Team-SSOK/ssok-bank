@@ -37,7 +37,7 @@ public class AccountController {
 
     // 계좌 생성 API
     @PostMapping("/account")
-    public ResponseEntity<ApiResponse<String>> createAccount(HttpServletRequest request, @RequestBody AccountRequestDTO accountRequest) {
+    public ApiResponse<String> createAccount(HttpServletRequest request, @RequestBody AccountRequestDTO accountRequest) {
         String source = request.getHeader("X-Source"); // TODO: 협의 필요 (Service 송신 여부 확인 방식)
 
         try {
@@ -95,23 +95,23 @@ public class AccountController {
             log.info("Account created successfully for user: {}. Account Number: {}", user.getUsername(), account.getAccountNumber());
 
             // 성공 응답
-            return ResponseEntity.ok().body(ApiResponse.onSuccess("계좌 생성 완료: " + account.getAccountNumber()));
+            return ApiResponse.onSuccess("계좌 생성 완료: " + account.getAccountNumber());
         } catch (BaseException e) {
             log.error("Error occurred during account creation: {}", e.getMessage(), e);
 
             // 실패 응답
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.onFailure(e.getStatus().getCode(), e.getMessage(), null));
+            return ApiResponse.onFailure(e.getStatus().getCode(), e.getMessage(), null);
         } catch (Exception e) {
             log.error("Unexpected error occurred: {}", e.getMessage(), e);
 
             // 서버 오류 응답
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ApiResponse.onFailure(FailureStatusCode._INTERNAL_SERVER_ERROR.getCode(), "서버 오류가 발생했습니다. 나중에 다시 시도해주세요.", null));
+            return ApiResponse.onFailure(FailureStatusCode._INTERNAL_SERVER_ERROR.getCode(), "서버 오류가 발생했습니다. 나중에 다시 시도해주세요.", null);
         }
     }
 
     // 사용자 별 계좌 조회 API
     @GetMapping("/account")
-    public ResponseEntity<ApiResponse<List<AccountResponseDTO>>> getUserAccounts(
+    public ApiResponse<List<AccountResponseDTO>> getUserAccounts(
             @RequestParam String username,
             @RequestParam String phoneNumber) {
 
@@ -124,26 +124,22 @@ public class AccountController {
             // 1-1. 조회 결과 계좌가 없는 경우
             if (response.isEmpty()) {
                 log.warn("계좌 없음: username = {}, phoneNumber = {}", username, phoneNumber);
-                return ResponseEntity.ok(ApiResponse.onSuccess(response)); // 또는 notFound()도 가능
+                return ApiResponse.onSuccess(response); // 또는 notFound()도 가능
             }
 
             // 성공 응답
             log.info("계좌 조회 성공: username = {}, 계좌 수 = {}", username, response.size());
-            return ResponseEntity.ok(ApiResponse.onSuccess(response));
+            return ApiResponse.onSuccess(response);
 
         } catch (BaseException e) {
             log.error("계좌 조회 실패: username = {}, 에러 = {}", username, e.getMessage());
 
-            return ResponseEntity
-                    .status(e.getStatus().getHttpStatus())
-                    .body(ApiResponse.onFailure(e.getStatus().getCode(), e.getStatus().getMessage(), null));
+            return ApiResponse.onFailure(e.getStatus().getCode(), e.getStatus().getMessage(), null);
 
         } catch (Exception e) {
             log.error("계좌 조회 중 알 수 없는 오류 발생: username = {}, 에러 = {}", username, e.getMessage(), e);
 
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(ApiResponse.onFailure("INTERNAL500", "서버 내부 오류가 발생했습니다.", null));
+            return ApiResponse.onFailure("INTERNAL500", "서버 내부 오류가 발생했습니다.", null);
         }
     }
 

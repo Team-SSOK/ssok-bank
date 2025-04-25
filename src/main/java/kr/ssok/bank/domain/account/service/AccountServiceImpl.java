@@ -93,7 +93,7 @@ public class AccountServiceImpl implements AccountService{
         //계좌 유형 고려
         String typeCode = String.format("%02d", accountTypeCode.getIdx()); // 예: 01, 02, 03
 
-        //고유 번호 생성
+        //고유 번호 생성 (추후 검증번호 넣는 방식 고려 가능)
         String accountNumber;
         do {
             int randomPart = (int)(Math.random() * 9000) + 1000; // 4자리 랜덤
