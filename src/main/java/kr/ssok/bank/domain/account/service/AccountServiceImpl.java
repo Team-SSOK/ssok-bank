@@ -28,7 +28,7 @@ public class AccountServiceImpl implements AccountService{
     // 계좌 생성 메서드
     public Account createAccount(User user, AccountTypeCode accountTypeCode) throws BaseException {
         try {
-            log.info("Creating account for user: {}", user.getUsername());
+            log.info("사용자 생성 시작: {}", user.getUsername());
 
             // 계좌 생성 시 빌더 패턴을 사용
             Account account = Account.builder()
@@ -41,13 +41,13 @@ public class AccountServiceImpl implements AccountService{
                     .user(user)
                     .build();
 
-            log.info("Account successfully created for user: {}", user.getUsername());
+            log.info("사용자 생성 완료: {}", user.getUsername());
 
             // 계좌 저장
             return accountRepository.save(account);
         } catch (Exception e) {
-            log.error("Failed to create account for user: {}", user.getUsername(), e);
-            throw new RuntimeException("Account creation failed", e);
+            log.error("계좌 생성 중 오류 발생: {}", user.getUsername(), e);
+            throw new BaseException(FailureStatusCode.ACCOUNT_CREATE_FAILED);
         }
 
     }
