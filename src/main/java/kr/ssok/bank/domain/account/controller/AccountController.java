@@ -6,6 +6,7 @@ import kr.ssok.bank.common.constant.UserTypeCode;
 import kr.ssok.bank.common.response.ApiResponse;
 import kr.ssok.bank.common.response.code.status.ErrorStatusCode;
 import kr.ssok.bank.domain.account.dto.AccountRequestDTO;
+import kr.ssok.bank.domain.account.dto.AccountResponseDTO;
 import kr.ssok.bank.domain.account.entity.Account;
 import kr.ssok.bank.domain.account.service.AccountService;
 import kr.ssok.bank.domain.user.dto.UserRequestDTO;
@@ -17,6 +18,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import lombok.extern.slf4j.Slf4j;
+
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -39,7 +42,7 @@ public class AccountController {
         String source = request.getHeader("X-Source"); // TODO: 협의 필요 (Service 송신 여부 확인 방식)
 
         try {
-            log.info("Received request to create account for user: {} with phone: {} from : {}"
+            log.info("[POST] /account - 계좌 생성 요청: userName = {} with phone = {} from = {}"
                     , accountRequest.getUsername(), accountRequest.getPhoneNumber(), source);
 
             // 1. 사용자 조회
@@ -106,4 +109,42 @@ public class AccountController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ApiResponse.onFailure(ErrorStatusCode._INTERNAL_SERVER_ERROR.getCode(), "서버 오류가 발생했습니다. 나중에 다시 시도해주세요.", null));
         }
     }
+
+    // 사용자 별 계좌 조회 API
+    @GetMapping("/account")
+    public ResponseEntity<ApiResponse<List<AccountResponseDTO>>> getUserAccounts(@RequestParam String username) {
+        log.info("[GET] /account - 계좌 조회 요청: username = {}", username);
+
+        try {
+            // 1. 계좌 조회
+            List<AccountResponseDTO> response = accountService.getAccountsByUsername(username);
+
+            // 1-1. 조회 결과 계좌가 없는 경우
+            if (response.isEmpty()) {
+                log.warn("계좌 없음: username = {}", username);
+                return ResponseEntity.ok(ApiResponse.onSuccess(response)); // or return notFound?
+            }
+
+            // 성공 응답
+            log.info("계좌 조회 성공: username = {}, 계좌 수 = {}", username, response.size());
+            return ResponseEntity.ok(ApiResponse.onSuccess(response));
+
+        } catch (BaseException e) {
+            log.error("계좌 조회 실패: username = {}, 에러 = {}", username, e.getMessage());
+            
+            // 실패 응답
+            return ResponseEntity
+                    .status(e.getStatus().getHttpStatus())
+                    .body(ApiResponse.onFailure(e.getStatus().getCode(), e.getStatus().getMessage(), null));
+        } catch (Exception e) {
+            log.error("계좌 조회 중 알 수 없는 오류 발생: username = {}, 에러 = {}", username, e.getMessage(), e);
+            
+            // 서버 오류 응답
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResponse.onFailure("INTERNAL500", "서버 내부 오류가 발생했습니다.", null));
+        }
+    }
+
+
 }

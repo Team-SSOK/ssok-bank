@@ -4,18 +4,26 @@ import kr.ssok.bank.common.constant.AccountStatusCode;
 import kr.ssok.bank.common.constant.AccountTypeCode;
 import kr.ssok.bank.common.constant.BankCode;
 import kr.ssok.bank.common.exception.BaseException;
+import kr.ssok.bank.common.response.code.status.ErrorStatusCode;
+import kr.ssok.bank.common.response.code.status.SuccessStatusCode;
+import kr.ssok.bank.domain.account.dto.AccountResponseDTO;
 import kr.ssok.bank.domain.account.entity.Account;
 import kr.ssok.bank.domain.account.repository.AccountRepository;
 import kr.ssok.bank.domain.user.entity.User;
+import kr.ssok.bank.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class AccountServiceImpl implements AccountService{
 
+    private final UserRepository userRepository;
     private final AccountRepository accountRepository;
 
     // 계좌 생성 메서드
@@ -43,6 +51,39 @@ public class AccountServiceImpl implements AccountService{
             throw new RuntimeException("Account creation failed", e);
         }
 
+    }
+
+    // 사용자 별 계좌 조회 메서드
+    @Override
+    public List<AccountResponseDTO> getAccountsByUsername(String username) {
+        log.info("계좌 조회 요청: username = {}", username);
+
+        // 사용자 조회
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> {
+                    log.warn("사용자 정보 없음: username = {}", username);
+                    return new BaseException(ErrorStatusCode.USER_NOT_FOUND);
+                });
+
+        // 사용자의 전체 계좌 조회
+        List<Account> accounts = accountRepository.findAllByUser(user);
+
+        List<AccountResponseDTO> result = accounts.stream().map(account ->
+                AccountResponseDTO.builder()
+                        .accountNumber(account.getAccountNumber())
+                        .balance(account.getBalance())
+                        .bankCode(account.getBankCode().getIdx())
+                        .accountStatusCode(account.getAccountStatusCode().getIdx())
+                        .accountTypeCode(account.getAccountTypeCode().getIdx())
+                        .withdrawLimit(account.getWithdrawLimit())
+                        .createdAt(account.getCreatedAt().toLocalDate())
+                        .updatedAt(account.getUpdatedAt().toLocalDate())
+                        .build()
+        ).collect(Collectors.toList());
+
+        log.info("계좌 조회 성공: username = {}, 계좌 수 = {}", username, result.size());
+
+        return result;
     }
 
     // 계좌번호 채번 메서드 (중복 체크 포함)
