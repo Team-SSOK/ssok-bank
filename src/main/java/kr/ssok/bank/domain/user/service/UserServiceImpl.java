@@ -5,26 +5,24 @@ import kr.ssok.bank.common.constant.FailureStatusCode;
 import kr.ssok.bank.domain.user.dto.UserRequestDTO;
 import kr.ssok.bank.domain.user.entity.User;
 import kr.ssok.bank.domain.user.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
+@Transactional
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService{
 
     private final UserRepository userRepository;
 
-    @Autowired
-    public UserServiceImpl(UserRepository userRepository)
-    {
-        this.userRepository = userRepository;
-    }
-
     @Override
     public User createUser(UserRequestDTO userDto) throws BaseException {
 
-        this.userRepository.findByUsername(userDto.getUsername()).ifPresent(user -> {
+        this.userRepository.findByUsernameAndPhoneNumber(userDto.getUsername(),userDto.getPhoneNumber()).ifPresent(user -> {
             throw new BaseException(FailureStatusCode.USER_ALREADY_EXISTS);
         });
 

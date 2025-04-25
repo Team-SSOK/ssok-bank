@@ -13,13 +13,15 @@ import kr.ssok.bank.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Service
-@RequiredArgsConstructor
 @Slf4j
+@Service
+@Transactional
+@RequiredArgsConstructor
 public class AccountServiceImpl implements AccountService{
 
     private final UserRepository userRepository;
@@ -50,6 +52,13 @@ public class AccountServiceImpl implements AccountService{
             throw new BaseException(FailureStatusCode.ACCOUNT_CREATE_FAILED);
         }
 
+    }
+
+    @Override
+    public Account getAccountByAccountNumber(String accountNumber) throws BaseException {
+        return this.accountRepository.findAccountByAccountNumber(accountNumber).orElseThrow(()->
+            new BaseException(FailureStatusCode.ACCOUNT_NOT_FOUND)
+        );
     }
 
     // 사용자 별 계좌 조회 메서드
