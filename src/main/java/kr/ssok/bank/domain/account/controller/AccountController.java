@@ -1,9 +1,10 @@
 package kr.ssok.bank.domain.account.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
-import kr.ssok.bank.common.constant.UserTypeCode;
-import kr.ssok.bank.common.response.ApiResponse;
 import kr.ssok.bank.common.constant.FailureStatusCode;
+import kr.ssok.bank.common.constant.UserTypeCode;
+import kr.ssok.bank.common.exception.BaseException;
+import kr.ssok.bank.common.response.ApiResponse;
 import kr.ssok.bank.domain.account.dto.AccountRequestDTO;
 import kr.ssok.bank.domain.account.dto.AccountResponseDTO;
 import kr.ssok.bank.domain.account.entity.Account;
@@ -12,11 +13,10 @@ import kr.ssok.bank.domain.user.dto.UserRequestDTO;
 import kr.ssok.bank.domain.user.entity.User;
 import kr.ssok.bank.domain.user.repository.UserRepository;
 import kr.ssok.bank.domain.user.service.UserService;
-import kr.ssok.bank.common.exception.BaseException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 
@@ -144,6 +144,14 @@ public class AccountController {
                     .body(ApiResponse.onFailure("INTERNAL500", "서버 내부 오류가 발생했습니다.", null));
         }
     }
+
+
+//    @GetMapping("/account/owner")
+//    public ApiResponse<AccountOwnerCheckResponseDTO> getUserAccounts(@RequestBody AccountOwnerCheckRequestDTO dto)
+//    {
+////        Account account = this.accountService.getAccountByAccountNumber(dto.getAccount());
+//
+//    }
 
 
 }

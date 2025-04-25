@@ -24,7 +24,9 @@ public enum FailureStatusCode implements BaseCode {
 
     // 로그인 관련 에러
     LOGIN_FAILED(HttpStatus.UNAUTHORIZED, "AUTH4002", "아이디 또는 비밀번호를 확인해주세요."),
-    INVALID_TOKEN(HttpStatus.BAD_REQUEST,"AUTH4001", "잘못된 토큰입니다.");
+    INVALID_TOKEN(HttpStatus.BAD_REQUEST,"AUTH4001", "잘못된 토큰입니다."),
+
+    ACCOUNT_NOT_FOUND(HttpStatus.BAD_REQUEST, "ACNT4001", "해당 계좌 번호는 존재하지 않습니다.");
 
     private final HttpStatus httpStatus;
     private final String code;

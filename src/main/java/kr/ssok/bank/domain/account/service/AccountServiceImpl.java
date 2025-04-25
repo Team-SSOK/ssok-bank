@@ -52,6 +52,13 @@ public class AccountServiceImpl implements AccountService{
 
     }
 
+    @Override
+    public Account getAccountByAccountNumber(String accountNumber) throws BaseException {
+        return this.accountRepository.findAccountByAccountNumber(accountNumber).orElseThrow(()->
+            new BaseException(FailureStatusCode.ACCOUNT_NOT_FOUND)
+        );
+    }
+
     // 사용자 별 계좌 조회 메서드
     @Override
     public List<AccountResponseDTO> getAccountsByUsername(String username) {
