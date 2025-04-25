@@ -95,6 +95,15 @@ public class AccountServiceImpl implements AccountService{
         return result;
     }
 
+    // 휴면 계좌 여부 확인 메서드
+    @Override
+    public boolean isAccountDormant(String accountNumber) {
+        Account account = accountRepository.findByAccountNumber(accountNumber)
+                .orElseThrow(() -> new BaseException(FailureStatusCode.ACCOUNT_NOT_FOUND));
+
+        return account.isDormant();
+    }
+
     // 계좌번호 채번 메서드 (중복 체크 포함)
     private String generateAccountNumber(AccountTypeCode accountTypeCode) {
         String bankPrefix = "626"; //SSOK 뱅크 계좌 Prefix 임의 지정 (LG CNS AM 종강일자)

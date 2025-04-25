@@ -12,4 +12,5 @@ public interface AccountService {
     public Account createAccount(User user, AccountTypeCode accountTypeCode) throws BaseException;
     public Account getAccountByAccountNumber(String accountNumber);
     public List<AccountResponseDTO> getAccountsByUsernameAndPhoneNumber(String username, String phoneNumber);
+    public boolean isAccountDormant(String accountNumber);
 }
