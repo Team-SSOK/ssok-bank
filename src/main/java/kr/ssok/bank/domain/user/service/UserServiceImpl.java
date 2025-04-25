@@ -22,7 +22,7 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public void createUser(UserRequestDTO userDto) throws BaseException {
+    public User createUser(UserRequestDTO userDto) throws BaseException {
 
         this.userRepository.findByUsername(userDto.getUsername()).ifPresent(user -> {
             throw new BaseException(ErrorStatus.USER_ALREADY_EXISTS);
@@ -31,9 +31,11 @@ public class UserServiceImpl implements UserService{
         User user = User.builder().username(userDto.getUsername())
                 .phoneNumber(userDto.getPhoneNumber())
                 .userTypeCode(userDto.getUserTypeCode())
+                .dailyTransactionTotal(0L)
                 .build();
 
         this.userRepository.save(user);
 
+        return user;
     }
 }
