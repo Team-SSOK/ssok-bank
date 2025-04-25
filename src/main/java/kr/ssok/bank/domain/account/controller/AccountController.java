@@ -1,10 +1,13 @@
 package kr.ssok.bank.domain.account.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletRequest;
 import kr.ssok.bank.common.constant.SuccessStatusCode;
 import kr.ssok.bank.common.constant.UserTypeCode;
 import kr.ssok.bank.common.response.ApiResponse;
 import kr.ssok.bank.common.constant.FailureStatusCode;
+import kr.ssok.bank.domain.account.dto.AccountOwnerCheckRequestDTO;
+import kr.ssok.bank.domain.account.dto.AccountOwnerCheckResponseDTO;
 import kr.ssok.bank.domain.account.dto.AccountRequestDTO;
 import kr.ssok.bank.domain.account.dto.AccountResponseDTO;
 import kr.ssok.bank.domain.account.entity.Account;
@@ -14,27 +17,20 @@ import kr.ssok.bank.domain.user.entity.User;
 import kr.ssok.bank.domain.user.repository.UserRepository;
 import kr.ssok.bank.domain.user.service.UserService;
 import kr.ssok.bank.common.exception.BaseException;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import lombok.extern.slf4j.Slf4j;
-
 import java.util.List;
 
 @Slf4j
 @RestController
 @RequestMapping("/api/bank")
+@RequiredArgsConstructor
 public class AccountController {
 
     private final AccountService accountService;
     private final UserRepository userRepository;
     private final UserService userService;
-
-    public AccountController(AccountService accountService, UserRepository userRepository, UserService userService) {
-        this.accountService = accountService;
-        this.userRepository = userRepository;
-        this.userService = userService;
-    }
 
     // 계좌 생성 API
     @PostMapping("/account")
@@ -144,5 +140,39 @@ public class AccountController {
         }
     }
 
+    @Operation(summary = "예금주명 조회", description = "요청받은 계좌번호의 예금주명을 조회 합니다.")
+    @GetMapping("/account/owner")
+    public ApiResponse<AccountOwnerCheckResponseDTO> getUserAccounts(@RequestBody AccountOwnerCheckRequestDTO dto)
+    {
+        Account account = this.accountService.getAccountByAccountNumber(dto.getAccount());
+
+        //해당 계좌번호의 계좌가 존재하는지 확인
+        if(account != null)
+        {
+            User user = account.getUser();
+            //해당 계좌의 사용자가 존재하는지 확인
+            if (user != null)
+            {
+                AccountOwnerCheckResponseDTO res = AccountOwnerCheckResponseDTO.builder()
+                        .username(user.getUsername())
+                        .build();
+
+                log.info("예금주명 조회 성공. account = {}, username = {}", dto.getAccount(), user.getUsername());
+                //성공 응답
+                return ApiResponse.of(SuccessStatusCode.ACCOUNT_OWNER_CHECK_OK,res);
+            }
+            else
+            {
+                log.error("예금주명 조회 중 해당 계좌의 사용자가 존재하지 않습니다.");
+                return ApiResponse.of(FailureStatusCode.ACCOUNT_OWNER_CHECK_FAILED,null);
+            }
+
+        }
+        else
+        {
+            log.error("예금주명 조회 중 요청한 계좌번호는 존재 하지 않습니다. account = {}", dto.getAccount());
+            return ApiResponse.of(FailureStatusCode.ACCOUNT_OWNER_CHECK_FAILED,null);
+        }
+    }
 
 }
