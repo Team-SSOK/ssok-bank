@@ -6,9 +6,7 @@ import kr.ssok.bank.common.constant.AccountTypeCode;
 import kr.ssok.bank.common.constant.BankCode;
 import kr.ssok.bank.common.entity.TimeStamp;
 import kr.ssok.bank.domain.user.entity.User;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -17,6 +15,8 @@ import java.util.Date;
 @Entity
 @Getter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Account extends TimeStamp {
 
     @Id
