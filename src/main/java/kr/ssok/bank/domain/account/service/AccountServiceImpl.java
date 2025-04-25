@@ -57,7 +57,7 @@ public class AccountServiceImpl implements AccountService{
     @Override
     public Account getAccountByAccountNumber(String accountNumber) throws BaseException {
         return this.accountRepository.findAccountByAccountNumber(accountNumber).orElseThrow(()->
-            new BaseException(FailureStatusCode.ACCOUNT_NOT_FOUND)
+                new BaseException(FailureStatusCode.ACCOUNT_NOT_FOUND)
         );
     }
 
@@ -98,7 +98,7 @@ public class AccountServiceImpl implements AccountService{
     // 휴면 계좌 여부 확인 메서드
     @Override
     public boolean isAccountDormant(String accountNumber) {
-        Account account = accountRepository.findByAccountNumber(accountNumber)
+        Account account = accountRepository.findAccountByAccountNumber(accountNumber)
                 .orElseThrow(() -> new BaseException(FailureStatusCode.ACCOUNT_NOT_FOUND));
 
         return account.isDormant();
