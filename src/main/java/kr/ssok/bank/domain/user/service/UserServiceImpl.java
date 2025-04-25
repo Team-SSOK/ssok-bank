@@ -1,7 +1,7 @@
 package kr.ssok.bank.domain.user.service;
 
 import kr.ssok.bank.common.exception.BaseException;
-import kr.ssok.bank.common.response.code.status.ErrorStatusCode;
+import kr.ssok.bank.common.constant.FailureStatusCode;
 import kr.ssok.bank.domain.user.dto.UserRequestDTO;
 import kr.ssok.bank.domain.user.entity.User;
 import kr.ssok.bank.domain.user.repository.UserRepository;
@@ -22,18 +22,20 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public void createUser(UserRequestDTO userDto) throws BaseException {
+    public User createUser(UserRequestDTO userDto) throws BaseException {
 
         this.userRepository.findByUsername(userDto.getUsername()).ifPresent(user -> {
-            throw new BaseException(ErrorStatusCode.USER_ALREADY_EXISTS);
+            throw new BaseException(FailureStatusCode.USER_ALREADY_EXISTS);
         });
 
         User user = User.builder().username(userDto.getUsername())
                 .phoneNumber(userDto.getPhoneNumber())
                 .userTypeCode(userDto.getUserTypeCode())
+                .dailyTransactionTotal(0L)
                 .build();
 
         this.userRepository.save(user);
 
+        return user;
     }
 }

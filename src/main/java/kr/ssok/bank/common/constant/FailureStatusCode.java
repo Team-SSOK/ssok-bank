@@ -1,14 +1,14 @@
-package kr.ssok.bank.common.response.code.status;
+package kr.ssok.bank.common.constant;
 
-import kr.ssok.bank.common.response.code.BaseErrorCode;
-import kr.ssok.bank.common.response.code.ErrorReasonDTO;
+import kr.ssok.bank.common.response.BaseCode;
+import kr.ssok.bank.common.response.BaseResponseDTO;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
 @Getter
 @AllArgsConstructor
-public enum ErrorStatusCode implements BaseErrorCode {
+public enum FailureStatusCode implements BaseCode {
 
     // 가장 일반적인 응답
     _INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "COMMON500", "서버 에러, 관리자에게 문의 바랍니다."),
@@ -31,8 +31,8 @@ public enum ErrorStatusCode implements BaseErrorCode {
     private final String message;
 
     @Override
-    public ErrorReasonDTO getReason() {
-        return ErrorReasonDTO.builder()
+    public BaseResponseDTO getReason() {
+        return BaseResponseDTO.builder()
                 .message(message)
                 .code(code)
                 .isSuccess(false)
@@ -40,8 +40,8 @@ public enum ErrorStatusCode implements BaseErrorCode {
     }
 
     @Override
-    public ErrorReasonDTO getReasonHttpStatus() {
-        return ErrorReasonDTO.builder()
+    public BaseResponseDTO getReasonHttpStatus() {
+        return BaseResponseDTO.builder()
                 .message(message)
                 .code(code)
                 .isSuccess(false)

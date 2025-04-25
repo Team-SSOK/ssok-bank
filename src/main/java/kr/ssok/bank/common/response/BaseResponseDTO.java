@@ -1,4 +1,4 @@
-package kr.ssok.bank.common.response.code;
+package kr.ssok.bank.common.response;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -6,7 +6,7 @@ import org.springframework.http.HttpStatus;
 
 @Getter
 @Builder
-public class ErrorReasonDTO {
+public class BaseResponseDTO {
 
     private HttpStatus httpStatus;
 
