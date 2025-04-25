@@ -20,9 +20,9 @@ public class ApiResponse<T> {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private T result;
 
-    //코드 사용
+    // 코드 사용
     public static <T> ApiResponse<T> of(BaseCode code, T result){
-        return new ApiResponse<>(true, code.getReasonHttpStatus().getCode() , code.getReasonHttpStatus().getMessage(), result);
+        return new ApiResponse<>(code instanceof SuccessStatusCode, code.getReasonHttpStatus().getCode() , code.getReasonHttpStatus().getMessage(), result);
     }
 
     // 성공한 경우 응답 생성
@@ -30,15 +30,17 @@ public class ApiResponse<T> {
         return new ApiResponse<>(true, SuccessStatusCode._OK.getCode() , SuccessStatusCode._OK.getMessage(), result);
     }
 
+    // 하드 코딩 용도
     public static <T> ApiResponse<T> onSuccess(String code, String message, T data){
-        return new ApiResponse<>(false, code, message, data);
+        return new ApiResponse<>(true, code, message, data);
     }
 
     // 실패한 경우 응답 생성
     public static <T> ApiResponse<T> onFailure(T result){
-        return new ApiResponse<>(true, FailureStatusCode._BAD_REQUEST.getCode() , FailureStatusCode._BAD_REQUEST.getMessage(), result);
+        return new ApiResponse<>(false, FailureStatusCode._BAD_REQUEST.getCode() , FailureStatusCode._BAD_REQUEST.getMessage(), result);
     }
 
+    // 하드 코딩 용도
     public static <T> ApiResponse<T> onFailure(String code, String message, T data){
         return new ApiResponse<>(false, code, message, data);
     }
