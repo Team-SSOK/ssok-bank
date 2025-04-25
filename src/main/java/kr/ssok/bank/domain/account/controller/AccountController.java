@@ -2,11 +2,11 @@ package kr.ssok.bank.domain.account.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletRequest;
-import kr.ssok.bank.common.constant.AccountStatusCode;
+import kr.ssok.bank.common.constant.FailureStatusCode;
 import kr.ssok.bank.common.constant.SuccessStatusCode;
 import kr.ssok.bank.common.constant.UserTypeCode;
+import kr.ssok.bank.common.exception.BaseException;
 import kr.ssok.bank.common.response.ApiResponse;
-import kr.ssok.bank.common.constant.FailureStatusCode;
 import kr.ssok.bank.domain.account.dto.*;
 import kr.ssok.bank.domain.account.entity.Account;
 import kr.ssok.bank.domain.account.service.AccountService;
@@ -14,10 +14,10 @@ import kr.ssok.bank.domain.user.dto.UserRequestDTO;
 import kr.ssok.bank.domain.user.entity.User;
 import kr.ssok.bank.domain.user.repository.UserRepository;
 import kr.ssok.bank.domain.user.service.UserService;
-import kr.ssok.bank.common.exception.BaseException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.*;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -173,6 +173,7 @@ public class AccountController {
     @GetMapping("/account/owner")
     public ApiResponse<AccountOwnerCheckResponseDTO> getUserAccounts(@RequestBody AccountOwnerCheckRequestDTO dto)
     {
+        log.info("[GET] /account/owner - 예금주명 조회: accountNumber = {}", dto.getAccount());
         Account account = this.accountService.getAccountByAccountNumber(dto.getAccount());
 
         //해당 계좌번호의 계좌가 존재하는지 확인
@@ -186,20 +187,20 @@ public class AccountController {
                         .username(user.getUsername())
                         .build();
 
-                log.info("예금주명 조회 성공. account = {}, username = {}", dto.getAccount(), user.getUsername());
+                log.info("[예금주명 조회] 조회 성공. account = {}, username = {}", dto.getAccount(), user.getUsername());
                 //성공 응답
                 return ApiResponse.of(SuccessStatusCode.ACCOUNT_OWNER_CHECK_OK,res);
             }
             else
             {
-                log.error("예금주명 조회 중 해당 계좌의 사용자가 존재하지 않습니다.");
+                log.error("[예금주명 조회] 해당 계좌의 사용자가 존재하지 않습니다.");
                 return ApiResponse.of(FailureStatusCode.ACCOUNT_OWNER_CHECK_FAILED,null);
             }
 
         }
         else
         {
-            log.error("예금주명 조회 중 요청한 계좌번호는 존재 하지 않습니다. account = {}", dto.getAccount());
+            log.error("[예금주명 조회] 요청한 계좌번호는 존재 하지 않습니다. account = {}", dto.getAccount());
             return ApiResponse.of(FailureStatusCode.ACCOUNT_OWNER_CHECK_FAILED,null);
         }
     }
@@ -208,21 +209,22 @@ public class AccountController {
     @GetMapping("/account/valid")
     public ApiResponse<AccountValidRequestDTO> checkAccountValidation(@RequestBody AccountValidRequestDTO dto)
     {
+        log.info("[GET] /account/valid - 계좌 유효성 검사: username = {}, accountNumber = {}",dto.getUsername(), dto.getAccount());
         Optional<Account> accountOpt = Optional.ofNullable(this.accountService.getAccountByAccountNumber(dto.getAccount()));
         if(accountOpt.isPresent()) {
             Optional<User> userOpt = Optional.ofNullable(accountOpt.get().getUser());
             //해당 계좌의 사용자가 존재하는지 확인
             if (userOpt.isPresent() && dto.getAccount().equals(accountOpt.get().getAccountNumber()) && dto.getUsername().equals(userOpt.get().getUsername())) {
-                log.info("계좌 유효성 확인 성공. account = {}, username = {}", dto.getAccount(), userOpt.get().getUsername());
+                log.info("[계좌 유효성 검사] 계좌 유효성 확인 성공. account = {}, username = {}", dto.getAccount(), userOpt.get().getUsername());
                 return ApiResponse.of(SuccessStatusCode.ACCOUNT_VALIDATION_OK,null);
             }
             else {
-                log.error("계좌 유효성 검사중, 예금주와 계좌 정보가 일치하지 않습니다.");
+                log.error("[계좌 유효성 검사] 예금주와 계좌 정보가 일치하지 않습니다.");
                 return ApiResponse.of(FailureStatusCode.ACCOUNT_VALIDATION_FAILED,null);
             }
         }
         else {
-            log.error("계좌 유효성 검사중, 해당 계좌는 존재하지 않습니다.");
+            log.error("[계좌 유효성 검사] 해당 계좌는 존재하지 않습니다.");
             return ApiResponse.of(FailureStatusCode.ACCOUNT_NOT_FOUND,null);
         }
     }
