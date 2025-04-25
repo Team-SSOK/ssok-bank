@@ -34,13 +34,14 @@ public class UserController {
     private final UserService userService;
     private final AccountService accountService;
 
-    @Operation(summary = "사용자 생성", description = "사용자를 생성하고 예금계좌를 같이 생성합니다. / 사용자유형코드 (1:개인), 계좌유형코드 (1:예금)")
+//    @Operation(summary = "사용자 생성", description = "사용자를 생성하고 예금계좌를 같이 생성합니다. / 사용자유형코드 (1:개인), 계좌유형코드 (1:예금)")
+    @Operation(summary = "사용자 생성", description = "사용자를 생성합니다.")
     @PostMapping
     public ApiResponse<UserRequestDTO> createUser(@RequestBody UserRequestDTO userRequestDto, HttpServletRequest request) {
         try
         {
             User user = this.userService.createUser(userRequestDto);
-            this.accountService.createAccount(user, AccountTypeCode.DEPOSIT);
+//          this.accountService.createAccount(user, AccountTypeCode.DEPOSIT);
             return ApiResponse.of(SuccessStatusCode.USER_CREATION_OK,null);
         }
         catch (BaseException e)
