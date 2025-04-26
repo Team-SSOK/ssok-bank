@@ -210,11 +210,12 @@ public class AccountController {
     public ApiResponse<AccountValidRequestDTO> checkAccountValidation(@RequestBody AccountValidRequestDTO dto)
     {
         log.info("[GET] /account/valid - 계좌 유효성 검사: username = {}, accountNumber = {}",dto.getUsername(), dto.getAccount());
-        Optional<Account> accountOpt = Optional.ofNullable(this.accountService.getAccountByAccountNumber(dto.getAccount()));
-        if(accountOpt.isPresent()) {
-            Optional<User> userOpt = Optional.ofNullable(accountOpt.get().getUser());
+        try
+        {
+            Account account = this.accountService.getAccountByAccountNumber(dto.getAccount());
+            Optional<User> userOpt = Optional.ofNullable(account.getUser());
             //해당 계좌의 사용자가 존재하는지 확인
-            if (userOpt.isPresent() && dto.getAccount().equals(accountOpt.get().getAccountNumber()) && dto.getUsername().equals(userOpt.get().getUsername())) {
+            if (userOpt.isPresent() && dto.getAccount().equals(account.getAccountNumber()) && dto.getUsername().equals(userOpt.get().getUsername())) {
                 log.info("[계좌 유효성 검사] 계좌 유효성 확인 성공. account = {}, username = {}", dto.getAccount(), userOpt.get().getUsername());
                 return ApiResponse.of(SuccessStatusCode.ACCOUNT_VALIDATION_OK,null);
             }
@@ -223,8 +224,59 @@ public class AccountController {
                 return ApiResponse.of(FailureStatusCode.ACCOUNT_VALIDATION_FAILED,null);
             }
         }
-        else {
+        catch (BaseException e)
+        {
             log.error("[계좌 유효성 검사] 해당 계좌는 존재하지 않습니다.");
+            return ApiResponse.of(FailureStatusCode.ACCOUNT_NOT_FOUND,null);
+        }
+    }
+
+    @Operation(summary = "계좌 잔액 및 송금 한도 검사", description = "계좌에서 송금 처리가 가능한지를 확인합니다. (잔액 부족, 출금 한도 확인)")
+    @GetMapping("/account/transferable")
+    public ApiResponse<AccountTransferableCheckResponseDTO> checkTransferableAccount(@RequestBody AccountTransferableCheckRequestDTO dto)
+    {
+        log.info("[GET] /account/transferable - 계좌 잔액 및 송금 한도 검사: username = {}, accountNumber = {}, transferAmount = {}",dto.getUsername(), dto.getAccount(), dto.getTransferAmount());
+        try
+        {
+            Account account = this.accountService.getAccountByAccountNumber(dto.getAccount());
+
+            AccountTransferableCheckResponseDTO res = AccountTransferableCheckResponseDTO.builder()
+                    .balance(account.getBalance())
+                    .withdrawLimit(account.getWithdrawLimit())
+                    .isTransferable(false)
+                    .build();
+
+            Optional<User> userOpt = Optional.ofNullable(account.getUser());
+
+            if(userOpt.isEmpty() || !dto.getUsername().equals(userOpt.get().getUsername()))
+            {
+                log.error("[계좌 잔액 및 송금 한도 검사] 예금주와 계좌 정보가 일치하지 않습니다.");
+                return ApiResponse.of(FailureStatusCode.ACCOUNT_VALIDATION_FAILED,null);
+            }
+
+            if(dto.getTransferAmount() <= account.getBalance())
+            {
+                if(dto.getTransferAmount() <= account.getWithdrawLimit())
+                {
+                    res.setTransferable(true);
+                    log.info("[계좌 잔액 및 송금 한도 검사] 검사 성공. account = {}", dto.getAccount());
+                    return ApiResponse.of(SuccessStatusCode.TRANSFER_AVAILABLE,res);
+                }
+                else
+                {
+                    log.error("[계좌 잔액 및 송금 한도 검사] 송금 요청량이 출금 한도를 초과하였습니다.");
+                    return ApiResponse.of(FailureStatusCode.ACCOUNT_WITHDRAW_LIMIT_REACHED,res);
+                }
+            }
+            else
+            {
+                log.error("[계좌 잔액 및 송금 한도 검사] 해당 계좌는 잔액이 부족합니다.");
+                return ApiResponse.of(FailureStatusCode.TRANSFER_NO_BALANCE,res);
+            }
+        }
+        catch (BaseException e)
+        {
+            log.error("[계좌 잔액 및 송금 한도 검사] 해당 계좌는 존재하지 않습니다.");
             return ApiResponse.of(FailureStatusCode.ACCOUNT_NOT_FOUND,null);
         }
     }
