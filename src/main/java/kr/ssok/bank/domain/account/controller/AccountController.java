@@ -235,6 +235,7 @@ public class AccountController {
     @GetMapping("/account/transferable")
     public ApiResponse<AccountTransferableCheckResponseDTO> checkTransferableAccount(@RequestBody AccountTransferableCheckRequestDTO dto)
     {
+        log.info("[GET] /account/transferable - 계좌 잔액 및 송금 한도 검사: username = {}, accountNumber = {}, transferAmount = {}",dto.getUsername(), dto.getAccount(), dto.getTransferAmount());
         try
         {
             Account account = this.accountService.getAccountByAccountNumber(dto.getAccount());
