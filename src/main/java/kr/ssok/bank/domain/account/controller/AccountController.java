@@ -259,24 +259,24 @@ public class AccountController {
                 if(dto.getTransferAmount() <= account.getWithdrawLimit())
                 {
                     res.setTransferable(true);
-                    log.info("계좌 잔액 및 송금 한도 검사 성공. account = {}", dto.getAccount());
+                    log.info("[계좌 잔액 및 송금 한도 검사] 검사 성공. account = {}", dto.getAccount());
                     return ApiResponse.of(SuccessStatusCode.TRANSFER_AVAILABLE,res);
                 }
                 else
                 {
-                    log.error("계좌 잔액 및 송금 한도 검사중, 송금 요청량이 출금 한도를 초과하였습니다.");
+                    log.error("[계좌 잔액 및 송금 한도 검사] 송금 요청량이 출금 한도를 초과하였습니다.");
                     return ApiResponse.of(FailureStatusCode.ACCOUNT_WITHDRAW_LIMIT_REACHED,res);
                 }
             }
             else
             {
-                log.error("계좌 잔액 및 송금 한도 검사중, 해당 계좌는 잔액이 부족합니다.");
+                log.error("[계좌 잔액 및 송금 한도 검사] 해당 계좌는 잔액이 부족합니다.");
                 return ApiResponse.of(FailureStatusCode.TRANSFER_NO_BALANCE,res);
             }
         }
         catch (BaseException e)
         {
-            log.error("계좌 잔액 및 송금 한도 검사중, 해당 계좌는 존재하지 않습니다.");
+            log.error("[계좌 잔액 및 송금 한도 검사] 해당 계좌는 존재하지 않습니다.");
             return ApiResponse.of(FailureStatusCode.ACCOUNT_NOT_FOUND,null);
         }
     }
