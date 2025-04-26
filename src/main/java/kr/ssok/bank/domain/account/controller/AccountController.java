@@ -281,4 +281,29 @@ public class AccountController {
         }
     }
 
+    @Operation(summary = "계좌 잔액 확인", description = "계좌에서 잔액을 확인합니다.")
+    @GetMapping("/account/balance")
+    public ApiResponse<AccountBalanceResponseDTO> checkAccountBalance(@RequestBody AccountBalanceRequestDTO dto)
+    {
+        log.info("[GET] /account/balance - 계좌 잔액 확인: accountNumber = {}", dto.getAccount());
+        try
+        {
+            Optional<Account> accountOpt = Optional.ofNullable(this.accountService.getAccountByAccountNumber(dto.getAccount()));
+            if(accountOpt.isPresent()) {
+                Account account = accountOpt.get();
+                log.info("[계좌 잔액 확인] 계좌 잔액 조회 성공. balance = {} , account = {}", account.getBalance(), dto.getAccount());
+                return ApiResponse.of(SuccessStatusCode.ACCOUNT_BALANCE_OK, AccountBalanceResponseDTO.builder().balance(account.getBalance()).build());
+            }
+            else {
+                log.error("[계좌 잔액 확인] 계좌 잔액 조회에 실패하였습니다. account = {}",dto.getAccount());
+                return ApiResponse.of(FailureStatusCode.ACCOUNT_BALANCE_FAILED,null);
+            }
+        }
+        catch (BaseException e)
+        {
+            log.error("[계좌 잔액 확인] 해당 계좌는 존재하지 않습니다.");
+            return ApiResponse.of(FailureStatusCode.ACCOUNT_NOT_FOUND,null);
+        }
+    }
+
 }
