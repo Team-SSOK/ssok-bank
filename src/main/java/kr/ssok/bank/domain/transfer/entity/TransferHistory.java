@@ -6,15 +6,17 @@ import kr.ssok.bank.common.constant.TransferTypeCode;
 import kr.ssok.bank.common.entity.TimeStamp;
 import kr.ssok.bank.domain.account.entity.Account;
 import kr.ssok.bank.domain.user.entity.User;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
 
-@Getter
 @Entity
+@Getter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class TransferHistory extends TimeStamp {
 
     @Id
@@ -32,7 +34,7 @@ public class TransferHistory extends TimeStamp {
 
     // 상대 계좌 ID
     @Column(name = "counterpart_account", nullable = false)
-    private Long counterpartAccount;
+    private String counterpartAccount;
 
     // 송금 금액
     @Column(name = "transfer_amount", nullable = false)
@@ -47,14 +49,9 @@ public class TransferHistory extends TimeStamp {
     @Column(name = "balance_after", nullable = false)
     private Long balanceAfter = 0L;
 
-    private LocalDateTime convertToLocalDateTime(Date date) {
-        return date.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-    }
-
     // Account
     @Setter
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "account_id", nullable = false)
     private Account account;
-
 }

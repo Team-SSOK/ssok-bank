@@ -17,6 +17,7 @@ import java.util.List;
 
 @Entity
 @Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -39,6 +40,14 @@ public class Account extends TimeStamp {
     //잔액
     @Column(name = "balance" , nullable = false)
     private Long balance;
+
+    public void withdraw(Long amount) {
+        balance -= amount;
+    }
+
+    public void deposit(Long amount) {
+        balance += amount;
+    }
 
     //은행 코드
     @Enumerated(EnumType.STRING)
