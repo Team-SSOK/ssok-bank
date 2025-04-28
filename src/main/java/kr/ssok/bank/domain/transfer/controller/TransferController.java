@@ -1,21 +1,13 @@
 package kr.ssok.bank.domain.transfer.controller;
 
-import jakarta.servlet.http.HttpServletRequest;
+import io.swagger.v3.oas.annotations.Operation;
 import kr.ssok.bank.common.constant.FailureStatusCode;
 import kr.ssok.bank.common.constant.SuccessStatusCode;
-import kr.ssok.bank.common.constant.UserTypeCode;
 import kr.ssok.bank.common.exception.BaseException;
 import kr.ssok.bank.common.response.ApiResponse;
-import kr.ssok.bank.domain.account.dto.AccountRequestDTO;
-import kr.ssok.bank.domain.account.entity.Account;
-import kr.ssok.bank.domain.account.service.AccountService;
 import kr.ssok.bank.domain.transfer.dto.TransferDepositRequestDTO;
 import kr.ssok.bank.domain.transfer.dto.TransferWithdrawRequestDTO;
 import kr.ssok.bank.domain.transfer.service.TransferService;
-import kr.ssok.bank.domain.user.dto.UserRequestDTO;
-import kr.ssok.bank.domain.user.entity.User;
-import kr.ssok.bank.domain.user.repository.UserRepository;
-import kr.ssok.bank.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -32,6 +24,7 @@ public class TransferController {
     private final TransferService transferService;
 
     // 출금 이체 API
+    @Operation(summary = "출금 이체", description = "이용기관이 등록된 한 개의 사용자 계좌로부터 대금을 출금합니다.")
     @PostMapping("/withdraw")
     public ApiResponse<String> createWithdraw(@RequestBody TransferWithdrawRequestDTO transferWithdrawRequestDTO) {
         try {
@@ -55,6 +48,7 @@ public class TransferController {
     }
 
     // 입금 이체 API
+    @Operation(summary = "입금 이체", description = "이용기관이 사용자의 계좌로 대금을 송금합니다. .")
     @PostMapping("/deposit")
     public ApiResponse<String> createDeposit(@RequestBody TransferDepositRequestDTO transferDepositRequestDTO) {
         try {
