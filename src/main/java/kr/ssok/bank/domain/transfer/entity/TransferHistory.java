@@ -5,16 +5,18 @@ import kr.ssok.bank.common.constant.CurrencyCode;
 import kr.ssok.bank.common.constant.TransferTypeCode;
 import kr.ssok.bank.common.entity.TimeStamp;
 import kr.ssok.bank.domain.account.entity.Account;
-import kr.ssok.bank.domain.user.entity.User;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.Date;
+import static kr.ssok.bank.common.constant.CurrencyCode.WON;
 
-@Getter
 @Entity
+@Getter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Table(uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"transaction_id", "transfer_type"})
+})
 public class TransferHistory extends TimeStamp {
 
     @Id
@@ -23,7 +25,7 @@ public class TransferHistory extends TimeStamp {
     private Long transferId;
 
     // 오픈뱅킹 트랜잭션 ID
-    @Column(name = "transaction_id", nullable = false, unique = true)
+    @Column(name = "transaction_id", nullable = false)
     private String transactionId;
 
     // 송금 타입
@@ -32,7 +34,7 @@ public class TransferHistory extends TimeStamp {
 
     // 상대 계좌 ID
     @Column(name = "counterpart_account", nullable = false)
-    private Long counterpartAccount;
+    private String counterpartAccount;
 
     // 송금 금액
     @Column(name = "transfer_amount", nullable = false)
@@ -41,20 +43,15 @@ public class TransferHistory extends TimeStamp {
     // 통화 코드
     @Enumerated(EnumType.STRING)
     @Column(name = "currency_code", nullable = false)
-    private CurrencyCode currencyCode;
+    private CurrencyCode currencyCode = WON;
 
     // 송금 후 잔액
     @Column(name = "balance_after", nullable = false)
     private Long balanceAfter = 0L;
-
-    private LocalDateTime convertToLocalDateTime(Date date) {
-        return date.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-    }
 
     // Account
     @Setter
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "account_id", nullable = false)
     private Account account;
-
 }
