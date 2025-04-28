@@ -15,13 +15,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
+import java.util.concurrent.locks.ReentrantLock;
 
 @Service
 @RequiredArgsConstructor
 public class TransferServiceImpl {
 
-    //private Map<UUID, Object> lockMap = new HashMap<>();
+    private Map<String, ReentrantLock> lockMap = new HashMap<>();
 
     private final AccountRepository accountRepository;
     private final TransferRepository transferRepository;
