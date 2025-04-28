@@ -5,11 +5,11 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public enum CurrencyCode {
-    // 원화
-    WON(1,"WON"),
-    // 달러화
-    DOLLAR(2,"DOLLAR");
+public enum TransferTypeCode {
+    // 입금
+    DEPOSIT(1,"DEPOSIT"),
+    // 출금
+    WITHDRAW(2,"WITHDRAW");
 
     private final int idx;
     private final String value;
