@@ -32,13 +32,14 @@ public class AccountController {
     private final UserRepository userRepository;
     private final UserService userService;
 
-    // 계좌 생성 API
+    // 계좌 개설 API
+    @Operation(summary = "계좌 개설", description = "계좌를 개설합니다.")
     @PostMapping("/account")
     public ApiResponse<String> createAccount(HttpServletRequest request, @RequestBody AccountRequestDTO accountRequest) {
         String source = request.getHeader("X-Source"); // TODO: 협의 필요 (Service 송신 여부 확인 방식)
 
         try {
-            log.info("[POST] /account - 계좌 생성 요청: userName = {} with phone = {} from = {}"
+            log.info("[POST] /account - 계좌 개설 요청: userName = {} with phone = {} from = {}"
                     , accountRequest.getUsername(), accountRequest.getPhoneNumber(), source);
 
             // 1. 사용자 조회
@@ -86,20 +87,20 @@ public class AccountController {
 
             log.info("User found or created successfully: {} - {}", user.getUsername(), user.getPhoneNumber());
 
-            // 2. 계좌 생성
+            // 2. 계좌 개설
             Account account = accountService.createAccount(user, accountRequest.getAccountTypeCode());
 
-            log.info("계좌 생성 성공: {}. Account Number: {}", user.getUsername(), account.getAccountNumber());
+            log.info("계좌 개설 성공: {}. Account Number: {}", user.getUsername(), account.getAccountNumber());
 
             // 성공 응답
             return ApiResponse.of(SuccessStatusCode.ACCOUNT_CREATE_OK, null);
         } catch (BaseException e) {
-            log.error("계좌 생성 실패: {}", e.getMessage(), e);
+            log.error("계좌 개설 실패: {}", e.getMessage(), e);
 
             // 실패 응답
             return ApiResponse.of(FailureStatusCode.ACCOUNT_CREATE_FAILED, null);
         } catch (Exception e) {
-            log.error("계좌 생성 중 알 수 없는 오류 발생: {}", e.getMessage(), e);
+            log.error("계좌 개설 중 알 수 없는 오류 발생: {}", e.getMessage(), e);
 
             // 서버 오류 응답
             return ApiResponse.of(FailureStatusCode._INTERNAL_SERVER_ERROR, null);
@@ -107,6 +108,7 @@ public class AccountController {
     }
 
     // 사용자 별 계좌 조회 API
+    @Operation(summary = "계좌 조회", description = "오픈뱅킹 서버에서 계좌 조회 요청시, Account 테이블을 조회한 후 json으로 응답합니다.")
     @GetMapping("/account")
     public ApiResponse<List<AccountResponseDTO>> getUserAccounts(
             @RequestParam String username,
@@ -143,6 +145,7 @@ public class AccountController {
     }
 
     // 휴면 계좌 여부 확인 API
+    @Operation(summary = "휴면 계좌 여부 검사", description = "계좌의 휴면 여부를 검증한다.")
     @GetMapping("/account/dormant")
     public ApiResponse<Map<String, Boolean>> checkDormantAccount(@RequestParam String accountNumber) {
         log.info("[GET] /account/dormant - 휴면계좌 여부 확인 요청: accountNumber = {}", accountNumber);
