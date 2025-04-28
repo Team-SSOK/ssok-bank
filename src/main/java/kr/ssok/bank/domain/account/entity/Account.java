@@ -5,12 +5,15 @@ import kr.ssok.bank.common.constant.AccountStatusCode;
 import kr.ssok.bank.common.constant.AccountTypeCode;
 import kr.ssok.bank.common.constant.BankCode;
 import kr.ssok.bank.common.entity.TimeStamp;
+import kr.ssok.bank.domain.transfer.entity.TransferHistory;
 import kr.ssok.bank.domain.user.entity.User;
 import lombok.*;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Getter
@@ -20,6 +23,7 @@ import java.util.Date;
 public class Account extends TimeStamp {
 
     @Id
+    @Column(name = "account_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long accountId;
 
@@ -58,9 +62,15 @@ public class Account extends TimeStamp {
         return date.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
     }
 
+    // User
     @Setter
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
+
+    // TransferHistory
+    @Setter
+    @OneToMany(mappedBy = "account", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<TransferHistory> transferHistories = new ArrayList<>();
 
 }
