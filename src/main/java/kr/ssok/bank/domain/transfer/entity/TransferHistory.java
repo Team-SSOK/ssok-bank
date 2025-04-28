@@ -7,8 +7,6 @@ import kr.ssok.bank.common.entity.TimeStamp;
 import kr.ssok.bank.domain.account.entity.Account;
 import lombok.*;
 
-import static kr.ssok.bank.common.constant.CurrencyCode.WON;
-
 @Entity
 @Getter
 @Builder
@@ -29,6 +27,7 @@ public class TransferHistory extends TimeStamp {
     private String transactionId;
 
     // 송금 타입
+    @Enumerated(EnumType.STRING)
     @Column(name = "transfer_type", nullable = false)
     private TransferTypeCode transferTypeCode;
 
@@ -43,7 +42,7 @@ public class TransferHistory extends TimeStamp {
     // 통화 코드
     @Enumerated(EnumType.STRING)
     @Column(name = "currency_code", nullable = false)
-    private CurrencyCode currencyCode = WON;
+    private CurrencyCode currencyCode = CurrencyCode.WON;
 
     // 송금 후 잔액
     @Column(name = "balance_after", nullable = false)

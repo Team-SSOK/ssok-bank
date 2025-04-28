@@ -7,9 +7,9 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum CurrencyCode {
     // 원화
-    WON(1,"WON"),
+    WON(0,"WON"),
     // 달러화
-    DOLLAR(2,"DOLLAR");
+    DOLLAR(1,"DOLLAR");
 
     private final int idx;
     private final String value;

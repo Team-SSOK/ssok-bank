@@ -10,14 +10,17 @@ import kr.ssok.bank.common.response.ApiResponse;
 import kr.ssok.bank.domain.account.dto.*;
 import kr.ssok.bank.domain.account.entity.Account;
 import kr.ssok.bank.domain.account.service.AccountService;
+import kr.ssok.bank.domain.transfer.entity.TransferHistory;
 import kr.ssok.bank.domain.user.dto.UserRequestDTO;
 import kr.ssok.bank.domain.user.entity.User;
 import kr.ssok.bank.domain.user.repository.UserRepository;
 import kr.ssok.bank.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -302,6 +305,47 @@ public class AccountController {
         catch (BaseException e)
         {
             log.error("[계좌 잔액 확인] 해당 계좌는 존재하지 않습니다.");
+            return ApiResponse.of(FailureStatusCode.ACCOUNT_NOT_FOUND,null);
+        }
+    }
+
+    @Operation(summary = "계좌 거래 내역 조회", description = "단일 계좌에 대한 거래 내역을 조회합니다.")
+    @GetMapping("/account/history")
+    public ApiResponse<List<AccountTransferHistoryResponseDTO>> getTransferHistory(@RequestBody AccountTransferHistoryRequestDTO dto)
+    {
+        log.info("[GET] /account/history - 계좌 거래 내역 조회: accountNumber = {}", dto.getAccount());
+        try
+        {
+            Optional<Account> accountOpt = Optional.ofNullable(this.accountService.getAccountByAccountNumber(dto.getAccount()));
+            if(accountOpt.isPresent())
+            {
+                Account account = accountOpt.get();
+                List<TransferHistory> history = account.getTransferHistories();
+                List<AccountTransferHistoryResponseDTO> responseList = new ArrayList<>();
+
+                if(!history.isEmpty())
+                {
+                    ModelMapper modelMapper = new ModelMapper();
+                    responseList = history.stream()
+                            .map(transfer -> {
+                                AccountTransferHistoryResponseDTO res = modelMapper.map(transfer, AccountTransferHistoryResponseDTO.class);
+                                res.setAccount(account.getAccountNumber());
+                                return res;
+                            })
+                            .toList();
+                }
+
+                log.info("[계좌 거래 내역 조회] 거래 내역 조회 성공. account = {}", dto.getAccount());
+                return ApiResponse.of(SuccessStatusCode.ACCOUNT_HISTORY_OK, responseList);
+            }
+            else {
+                log.error("[계좌 거래 내역 조회] 내역 조회에 실패하였습니다. account = {}",dto.getAccount());
+                return ApiResponse.of(FailureStatusCode.ACCOUNT_HISTORY_FAILED,null);
+            }
+        }
+        catch (BaseException e)
+        {
+            log.error("[계좌 거래 내역 조회] 해당 계좌는 존재하지 않습니다.");
             return ApiResponse.of(FailureStatusCode.ACCOUNT_NOT_FOUND,null);
         }
     }
