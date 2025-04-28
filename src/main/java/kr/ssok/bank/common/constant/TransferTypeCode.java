@@ -7,9 +7,9 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum TransferTypeCode {
     // 입금
-    DEPOSIT(1,"DEPOSIT"),
+    DEPOSIT(0,"DEPOSIT"),
     // 출금
-    WITHDRAW(2,"WITHDRAW");
+    WITHDRAW(1,"WITHDRAW");
 
     private final int idx;
     private final String value;

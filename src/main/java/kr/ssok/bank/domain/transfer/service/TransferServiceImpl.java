@@ -19,7 +19,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 @Service
 @RequiredArgsConstructor
-public class TransferServiceImpl {
+public class TransferServiceImpl implements TransferService{
 
     private Map<String, ReentrantLock> lockMap = new HashMap<>();
 
@@ -46,6 +46,8 @@ public class TransferServiceImpl {
                 .transferAmount(dto.getTransferAmount())  // 송금 금액 기록
                 .balanceAfter(withdrawAccount.getBalance())  // 출금 후 잔액 기록
                 .transferTypeCode(TransferTypeCode.WITHDRAW)
+                .currencyCode(dto.getCurrencyCode())
+                .transactionId(dto.getTransactionId())
                 .build();
         transferRepository.save(history);
 
@@ -91,7 +93,10 @@ public class TransferServiceImpl {
                 .transferAmount(dto.getTransferAmount())  // 송금 금액 기록
                 .balanceAfter(depositAccount.getBalance())  // 입금 후 잔액 기록
                 .transferTypeCode(TransferTypeCode.DEPOSIT)
+                .currencyCode(dto.getCurrencyCode())
+                .transactionId(dto.getTransactionId())
                 .build();
+
         transferRepository.save(history);
 
         // 4. 변경된 계좌 저장
