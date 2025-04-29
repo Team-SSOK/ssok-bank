@@ -104,23 +104,46 @@ public class AccountServiceImpl implements AccountService{
         return account.isDormant();
     }
 
-    // 계좌번호 채번 메서드 (중복 체크 포함)
+    // 계좌번호 채번 메서드
     private String generateAccountNumber(AccountTypeCode accountTypeCode) {
-        String bankPrefix = "626"; //SSOK 뱅크 계좌 Prefix 임의 지정 (LG CNS AM 종강일자)
+        //SSOK 뱅크 계좌 Prefix 임의 지정 (LG CNS AM 종강일자)
+        String bankPrefix = "626";
 
-        //계좌 유형 고려
-        String typeCode = String.format("%02d", accountTypeCode.getIdx()); // 예: 01, 02, 03
+        //계좌 유형 고려 (예: 01 예금, 02 적금, 03 청약)
+        String typeCode = String.format("%02d", accountTypeCode.getIdx());
 
-        //고유 번호 생성 (추후 검증번호 넣는 방식 고려 가능)
-        String accountNumber;
+        String formattedAccountNumber;
+
         do {
             int randomPart = (int)(Math.random() * 9000) + 1000; // 4자리 랜덤
-            long timePart = System.currentTimeMillis() % 1_000_000L; // 6자리 시간 기반
+            long timeBase = System.currentTimeMillis() % 100_000L; // 5자리 시간
+            int checkDigitSource = Integer.parseInt(String.format("%02d%04d%05d", accountTypeCode.getIdx(), randomPart, timeBase));
 
-            accountNumber = String.format("%s-%s-%04d-%06d", bankPrefix, typeCode, randomPart, timePart);
-        } while (accountRepository.existsByAccountNumber(accountNumber));
+            // 검증 번호
+            int checkDigit = calculateLuhnCheckDigit(String.valueOf(checkDigitSource));
 
-        return accountNumber;
+            // 계좌번호 마지막 자리를 검증 번호로 대체
+            long timePartWithCheck = timeBase * 10 + checkDigit; // 예: 12345 → 123451
+
+            formattedAccountNumber = String.format("%s-%s-%04d-%06d", bankPrefix, typeCode, randomPart, timePartWithCheck);
+        } while (accountRepository.existsByAccountNumber(formattedAccountNumber));
+
+        return formattedAccountNumber;
     }
 
+    // 검증번호 체크 알고리즘
+    private int calculateLuhnCheckDigit(String number) {
+        int sum = 0;
+        boolean alternate = false;
+        for (int i = number.length() - 1; i >= 0; i--) {
+            int n = Character.getNumericValue(number.charAt(i));
+            if (alternate) {
+                n *= 2;
+                if (n > 9) n -= 9;
+            }
+            sum += n;
+            alternate = !alternate;
+        }
+        return (10 - (sum % 10)) % 10;
+    }
 }
