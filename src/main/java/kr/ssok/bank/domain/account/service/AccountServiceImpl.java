@@ -15,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -77,18 +78,22 @@ public class AccountServiceImpl implements AccountService{
         // 사용자의 전체 계좌 조회
         List<Account> accounts = accountRepository.findAllByUser(user);
 
-        List<AccountResponseDTO> result = accounts.stream().map(account ->
-                AccountResponseDTO.builder()
-                        .accountNumber(account.getAccountNumber())
-                        .balance(account.getBalance())
-                        .bankCode(account.getBankCode().getIdx())
-                        .accountStatusCode(account.getAccountStatusCode().getIdx())
-                        .accountTypeCode(account.getAccountTypeCode().getIdx())
-                        .withdrawLimit(account.getWithdrawLimit())
-                        .createdAt(account.getCreatedAt().toLocalDate())
-                        .updatedAt(account.getUpdatedAt().toLocalDate())
-                        .build()
-        ).collect(Collectors.toList());
+        List<AccountResponseDTO> result = accounts.stream().map(account -> {
+                    // createdAt 필드가 null일 경우 현재 날짜로 설정
+                    LocalDate createdAt = (account.getCreatedAt() != null) ? account.getCreatedAt().toLocalDate() : LocalDate.now();
+
+                    return AccountResponseDTO.builder()
+                            .accountNumber(account.getAccountNumber())
+                            .balance(account.getBalance())
+                            .bankCode(account.getBankCode().getIdx())
+                            .accountStatusCode(account.getAccountStatusCode().getIdx())
+                            .accountTypeCode(account.getAccountTypeCode().getIdx())
+                            .withdrawLimit(account.getWithdrawLimit())
+                            .createdAt(createdAt)  // null일 경우 기본값을 현재 날짜로 설정
+                            .updatedAt(account.getUpdatedAt() != null ? account.getUpdatedAt().toLocalDate() : LocalDate.now())
+                            .build();
+                })
+                .collect(Collectors.toList());
 
         log.info("계좌 조회 성공: username = {}, 계좌 수 = {}", username, result.size());
 
