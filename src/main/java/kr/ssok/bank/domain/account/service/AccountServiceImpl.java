@@ -117,10 +117,10 @@ public class AccountServiceImpl implements AccountService{
         do {
             int randomPart = (int)(Math.random() * 9000) + 1000; // 4자리 랜덤
             long timeBase = System.currentTimeMillis() % 100_000L; // 5자리 시간
-            int checkDigitSource = Integer.parseInt(String.format("%02d%04d%05d", accountTypeCode.getIdx(), randomPart, timeBase));
+            String checkDigitSource = String.format("%02d%04d%05d", accountTypeCode.getIdx(), randomPart, timeBase);
 
             // 검증 번호
-            int checkDigit = calculateLuhnCheckDigit(String.valueOf(checkDigitSource));
+            int checkDigit = calculateLuhnCheckDigit(checkDigitSource);
 
             // 계좌번호 마지막 자리를 검증 번호로 대체
             long timePartWithCheck = timeBase * 10 + checkDigit; // 예: 12345 → 123451

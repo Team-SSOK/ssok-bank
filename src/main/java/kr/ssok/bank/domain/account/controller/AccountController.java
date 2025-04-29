@@ -212,7 +212,7 @@ public class AccountController {
     }
 
     @Operation(summary = "계좌 유효성 검사", description = "계좌번호와 예금주 실명번호를 요청받아 해당 계좌의 유효성을 확인합니다.")
-    @GetMapping("/account/valid")
+    @PostMapping("/account/valid")
     public ApiResponse<AccountValidRequestDTO> checkAccountValidation(@RequestBody AccountValidRequestDTO dto)
     {
         log.info("[GET] /account/valid - 계좌 유효성 검사: username = {}, accountNumber = {}",dto.getUsername(), dto.getAccount());
