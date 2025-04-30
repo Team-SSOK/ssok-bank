@@ -17,7 +17,7 @@ public enum SuccessStatusCode implements BaseCode {
     TRANSFER_OK(HttpStatus.OK, "TRANSFER2001", "송금에 성공하였습니다."),
     TRANSFER_WITHDRAW_OK(HttpStatus.OK, "TRANSFER2002", "출금 이체에 성공하였습니다."),
     TRANSFER_DEPOSIT_OK(HttpStatus.OK, "TRANSFER2003", "입금 이체에 성공하였습니다."),
-    TRANSFER_AVAILABLE(HttpStatus.OK, "ACCCOUNT2008", "해당 계좌는 송금 처리 가능합니다."),
+    TRANSFER_AVAILABLE(HttpStatus.OK, "ACCOUNT2008", "해당 계좌는 송금 처리 가능합니다."),
 
     //유저 관련
     USER_FOUND_OK(HttpStatus.OK, "USER2001", "사용자를 찾았습니다."),
@@ -28,11 +28,13 @@ public enum SuccessStatusCode implements BaseCode {
     ACCOUNT_DORMANT_OK(HttpStatus.OK, "ACCOUNT2002", "휴면 계좌 여부 조회에 성공했습니다."),
     ACCOUNT_CREATE_OK(HttpStatus.OK, "ACCOUNT2003","계좌 생성이 완료되었습니다."),
     ACCOUNT_BALANCE_OK(HttpStatus.OK, "ACCOUNT2004","계좌 잔액 조회에 성공하였습니다."),
-    ACCOUNT_VALIDATION_OK(HttpStatus.OK, "ACCCOUNT2005", "예금주와 계좌 정보가 일치합니다."),
-    ACCOUNT_OWNER_CHECK_OK(HttpStatus.OK, "ACCCOUNT2006", "해당 계좌번호의 소유자(예금주)를 확인하였습니다."),
-    ACCOUNT_NUMBER_FOUND_OK(HttpStatus.OK, "ACCCOUNT2007", "해당 계좌 번호는 존재합니다."),
-    ACCOUNT_HISTORY_OK(HttpStatus.OK, "ACCCOUNT2008", "거래 내역이 조회 되었습니다.");
+    ACCOUNT_VALIDATION_OK(HttpStatus.OK, "ACCOUNT2005", "예금주와 계좌 정보가 일치합니다."),
+    ACCOUNT_OWNER_CHECK_OK(HttpStatus.OK, "ACCOUNT2006", "해당 계좌번호의 소유자(예금주)를 확인하였습니다."),
+    ACCOUNT_NUMBER_FOUND_OK(HttpStatus.OK, "ACCOUNT2007", "해당 계좌 번호는 존재합니다."),
+    ACCOUNT_HISTORY_OK(HttpStatus.OK, "ACCOUNT2008", "거래 내역이 조회 되었습니다."),
 
+    // 상품 관련
+    GOOD_READ_OK(HttpStatus.OK, "GOOD2001", "상품 내역이 조회 되었습니다.");
 
     private final HttpStatus httpStatus;
     private final String code;

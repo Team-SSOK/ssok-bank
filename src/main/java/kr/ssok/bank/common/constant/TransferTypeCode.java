@@ -9,7 +9,9 @@ public enum TransferTypeCode {
     // 입금
     DEPOSIT(0,"DEPOSIT"),
     // 출금
-    WITHDRAW(1,"WITHDRAW");
+    WITHDRAW(1,"WITHDRAW"),
+    // 이자
+    INTEREST(2, "INTEREST");
 
     private final int idx;
     private final String value;

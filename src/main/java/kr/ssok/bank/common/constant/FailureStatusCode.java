@@ -39,14 +39,18 @@ public enum FailureStatusCode implements BaseCode {
     ACCOUNT_HISTORY_FAILED(HttpStatus.BAD_REQUEST, "ACCOUNT4010", "거래 내역 조회에 실패하였습니다."),
 
     //거래 관련 에러
-    TRANSACTION_NOT_EXISTS(HttpStatus.BAD_REQUEST, "TRANSACTION4002", "거래 내역 존재하지 않습니다."),
+    TRANSACTION_NOT_EXISTS(HttpStatus.BAD_REQUEST, "TRANSACTION4002", "거래 내역이 존재하지 않습니다."),
     TRANSACTION_CREATE_FAILED(HttpStatus.BAD_REQUEST, "TRANSACTION4003", "거래 내역 생성에 실패하였습니다."),
 
     //송금 관련 에러
     TRANSFER_FAILED(HttpStatus.BAD_REQUEST, "TRANSFER4001", "송금에 실패하였습니다."),
     TRANSFER_DEPOSIT_FAILED(HttpStatus.BAD_REQUEST, "TRANSFER4002", "입금 이체에 실패하였습니다."),
     TRANSFER_WITHDRAW_FAILED(HttpStatus.BAD_REQUEST, "TRANSFER4003", "출금 이체에 실패하였습니다."),
-    TRANSFER_NO_BALANCE(HttpStatus.BAD_REQUEST, "TRANSFER4004", "해당 계좌는 잔액이 부족합니다.");
+    TRANSFER_NO_BALANCE(HttpStatus.BAD_REQUEST, "TRANSFER4004", "해당 계좌는 잔액이 부족합니다."),
+    TRANSFER_INTEREST_FAILED(HttpStatus.BAD_REQUEST, "TRANSFER4005", "해당 계좌에 이자 지급을 실패하였습니다."),
+
+    //상품 관련 에러
+    GOOD_READ_FAILED(HttpStatus.BAD_REQUEST, "GOOD4001", "상품 목록이 존재하지 않습니다.");
 
     private final HttpStatus httpStatus;
     private final String code;

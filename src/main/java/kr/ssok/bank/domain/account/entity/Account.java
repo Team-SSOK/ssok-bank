@@ -5,6 +5,7 @@ import kr.ssok.bank.common.constant.AccountStatusCode;
 import kr.ssok.bank.common.constant.AccountTypeCode;
 import kr.ssok.bank.common.constant.BankCode;
 import kr.ssok.bank.common.entity.TimeStamp;
+import kr.ssok.bank.domain.good.entity.Good;
 import kr.ssok.bank.domain.transfer.entity.TransferHistory;
 import kr.ssok.bank.domain.user.entity.User;
 import lombok.*;
@@ -71,6 +72,10 @@ public class Account extends TimeStamp {
         return date.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
     }
 
+    // 마지막 이자 지급 일시
+    @Column(name = "last_interest_paid_at")
+    private LocalDateTime lastInterestPaidAt;
+
     // User
     @Setter
     @ManyToOne(fetch = FetchType.LAZY)
@@ -81,5 +86,10 @@ public class Account extends TimeStamp {
     @Setter
     @OneToMany(mappedBy = "account", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<TransferHistory> transferHistories = new ArrayList<>();
+
+    // Good (상품)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "good_id", nullable = false)
+    private Good good;
 
 }

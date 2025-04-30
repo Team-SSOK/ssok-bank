@@ -1,6 +1,10 @@
 spring:
   application:
     name: ssok-bank
+  sql:
+    init:
+      mode: always
+      data-locations: classpath:db/init.sql
 
   jpa:
     properties:
