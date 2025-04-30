@@ -36,7 +36,7 @@ public class AccountController {
     private final UserService userService;
 
     @Operation(summary = "계좌 개설", description = "계좌를 개설합니다.")
-    @PostMapping("/account/search")
+    @PostMapping("/account")
     public ApiResponse<String> createAccount(HttpServletRequest request, @RequestBody AccountRequestDTO accountRequest) {
         String source = request.getHeader("X-Source"); // TODO: 협의 필요 (Service 송신 여부 확인 방식)
 
@@ -110,7 +110,7 @@ public class AccountController {
     }
 
     @Operation(summary = "계좌 조회", description = "오픈뱅킹 서버에서 계좌 조회 요청시, Account 테이블을 조회한 후 json으로 응답합니다.")
-    @PostMapping("/account")
+    @PostMapping("/account/search")
     public ApiResponse<List<AccountResponseDTO>> getUserAccounts(@RequestBody AccountRequestDTO accountRequest) {
 
         log.info("[POST] /account - 계좌 조회 요청: username = {}, phoneNumber = {}"
