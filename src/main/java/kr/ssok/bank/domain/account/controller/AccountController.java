@@ -100,7 +100,7 @@ public class AccountController {
             // 2-2. 계좌 개설
             Account account = accountService.createAccount(user, accountRequest.getAccountTypeCode(), good);
 
-            log.info("계좌 개설 성공: {}. Account Number: {}", user.getUsername(), account.getAccountNumber());
+            log.info("계좌 개설 성공: {}. ", user.getUsername() );
 
             // 성공 응답
             return ApiResponse.of(SuccessStatusCode.ACCOUNT_CREATE_OK, null);
@@ -156,7 +156,7 @@ public class AccountController {
     @Operation(summary = "휴면 계좌 여부 검사", description = "계좌의 휴면 여부를 검증한다.")
     @PostMapping("/account/dormant")
     public ApiResponse<Map<String, Boolean>> checkDormantAccount(@RequestBody AccountRequestDTO accountRequest) {
-        log.info("[POST] /account/dormant - 휴면계좌 여부 확인 요청: accountNumber = {}", accountRequest.getAccountNumber());
+        log.info("[POST] /account/dormant - 휴면계좌 여부 확인 요청");
 
         try {
             // 1. 휴면 계좌 여부 확인
@@ -167,13 +167,13 @@ public class AccountController {
             return ApiResponse.of(SuccessStatusCode.ACCOUNT_DORMANT_OK, result);
 
         } catch (BaseException e) {
-            log.error("휴면계좌 조회 실패: accountNumber = {}, 에러 = {}", accountRequest.getAccountNumber(), e.getMessage());
+            log.error("휴면계좌 조회 실패: 에러 = {}", e.getMessage());
 
             // 실패 응답
             return ApiResponse.of(FailureStatusCode.ACCOUNT_DORMANT_FAILED, null);
 
         } catch (Exception e) {
-            log.error("휴면계좌 조회 중 알 수 없는 오류 발생: accountNumber = {}, 에러 = {}", accountRequest.getAccountNumber(), e.getMessage(), e);
+            log.error("휴면계좌 조회 중 알 수 없는 오류 발생: 에러 = {}", e.getMessage(), e);
 
             // 서버 오류 응답
             return ApiResponse.of(FailureStatusCode._INTERNAL_SERVER_ERROR, null);
@@ -184,7 +184,7 @@ public class AccountController {
     @PostMapping("/account/owner")
     public ApiResponse<AccountOwnerCheckResponseDTO> getUserAccounts(@RequestBody AccountOwnerCheckRequestDTO dto)
     {
-        log.info("[POST] /account/owner - 예금주명 조회: accountNumber = {}", dto.getAccount());
+        log.info("[POST] /account/owner - 예금주명 조회");
         Account account = this.accountService.getAccountByAccountNumber(dto.getAccount());
 
         //해당 계좌번호의 계좌가 존재하는지 확인
@@ -198,7 +198,7 @@ public class AccountController {
                         .username(user.getUsername())
                         .build();
 
-                log.info("[예금주명 조회] 조회 성공. account = {}, username = {}", dto.getAccount(), user.getUsername());
+                log.info("[예금주명 조회] 조회 성공. username = {}", user.getUsername());
                 //성공 응답
                 return ApiResponse.of(SuccessStatusCode.ACCOUNT_OWNER_CHECK_OK,res);
             }
@@ -211,7 +211,7 @@ public class AccountController {
         }
         else
         {
-            log.error("[예금주명 조회] 요청한 계좌번호는 존재 하지 않습니다. account = {}", dto.getAccount());
+            log.error("[예금주명 조회] 요청한 계좌번호는 존재 하지 않습니다.");
             return ApiResponse.of(FailureStatusCode.ACCOUNT_OWNER_CHECK_FAILED,null);
         }
     }
@@ -220,14 +220,14 @@ public class AccountController {
     @PostMapping("/account/valid")
     public ApiResponse<AccountValidRequestDTO> checkAccountValidation(@RequestBody AccountValidRequestDTO dto)
     {
-        log.info("[POST] /account/valid - 계좌 유효성 검사: username = {}, accountNumber = {}",dto.getUsername(), dto.getAccount());
+        log.info("[POST] /account/valid - 계좌 유효성 검사: username = {}",dto.getUsername());
         try
         {
             Account account = this.accountService.getAccountByAccountNumber(dto.getAccount());
             Optional<User> userOpt = Optional.ofNullable(account.getUser());
             //해당 계좌의 사용자가 존재하는지 확인
             if (userOpt.isPresent() && dto.getAccount().equals(account.getAccountNumber()) && dto.getUsername().equals(userOpt.get().getUsername())) {
-                log.info("[계좌 유효성 검사] 계좌 유효성 확인 성공. account = {}, username = {}", dto.getAccount(), userOpt.get().getUsername());
+                log.info("[계좌 유효성 검사] 계좌 유효성 확인 성공. username = {}", userOpt.get().getUsername());
                 return ApiResponse.of(SuccessStatusCode.ACCOUNT_VALIDATION_OK,null);
             }
             else {
@@ -246,7 +246,7 @@ public class AccountController {
     @PostMapping("/account/transferable")
     public ApiResponse<AccountTransferableCheckResponseDTO> checkTransferableAccount(@RequestBody AccountTransferableCheckRequestDTO dto)
     {
-        log.info("[POST] /account/transferable - 계좌 잔액 및 송금 한도 검사: username = {}, accountNumber = {}, transferAmount = {}",dto.getUsername(), dto.getAccount(), dto.getTransferAmount());
+        log.info("[POST] /account/transferable - 계좌 잔액 및 송금 한도 검사: username = {}, transferAmount = {}",dto.getUsername(), dto.getTransferAmount());
         try
         {
             Account account = this.accountService.getAccountByAccountNumber(dto.getAccount());
@@ -270,7 +270,7 @@ public class AccountController {
                 if(dto.getTransferAmount() <= account.getWithdrawLimit())
                 {
                     res.setTransferable(true);
-                    log.info("[계좌 잔액 및 송금 한도 검사] 검사 성공. account = {}", dto.getAccount());
+                    log.info("[계좌 잔액 및 송금 한도 검사] 검사 성공.");
                     return ApiResponse.of(SuccessStatusCode.TRANSFER_AVAILABLE,res);
                 }
                 else
@@ -296,17 +296,17 @@ public class AccountController {
     @PostMapping("/account/balance")
     public ApiResponse<AccountBalanceResponseDTO> checkAccountBalance(@RequestBody AccountBalanceRequestDTO dto)
     {
-        log.info("[POST] /account/balance - 계좌 잔액 확인: accountNumber = {}", dto.getAccount());
+        log.info("[POST] /account/balance - 계좌 잔액 확인");
         try
         {
             Optional<Account> accountOpt = Optional.ofNullable(this.accountService.getAccountByAccountNumber(dto.getAccount()));
             if(accountOpt.isPresent()) {
                 Account account = accountOpt.get();
-                log.info("[계좌 잔액 확인] 계좌 잔액 조회 성공. balance = {} , account = {}", account.getBalance(), dto.getAccount());
+                log.info("[계좌 잔액 확인] 계좌 잔액 조회 성공. balance = {}", account.getBalance());
                 return ApiResponse.of(SuccessStatusCode.ACCOUNT_BALANCE_OK, AccountBalanceResponseDTO.builder().balance(account.getBalance()).build());
             }
             else {
-                log.error("[계좌 잔액 확인] 계좌 잔액 조회에 실패하였습니다. account = {}",dto.getAccount());
+                log.error("[계좌 잔액 확인] 계좌 잔액 조회에 실패하였습니다.");
                 return ApiResponse.of(FailureStatusCode.ACCOUNT_BALANCE_FAILED,null);
             }
         }
@@ -321,7 +321,7 @@ public class AccountController {
     @PostMapping("/account/history")
     public ApiResponse<List<AccountTransferHistoryResponseDTO>> getTransferHistory(@RequestBody AccountTransferHistoryRequestDTO dto)
     {
-        log.info("[POST] /account/history - 계좌 거래 내역 조회: accountNumber = {}", dto.getAccount());
+        log.info("[POST] /account/history - 계좌 거래 내역 조회");
         try
         {
             Optional<Account> accountOpt = Optional.ofNullable(this.accountService.getAccountByAccountNumber(dto.getAccount()));
@@ -343,11 +343,11 @@ public class AccountController {
                             .toList();
                 }
 
-                log.info("[계좌 거래 내역 조회] 거래 내역 조회 성공. account = {}", dto.getAccount());
+                log.info("[계좌 거래 내역 조회] 거래 내역 조회 성공.");
                 return ApiResponse.of(SuccessStatusCode.ACCOUNT_HISTORY_OK, responseList);
             }
             else {
-                log.error("[계좌 거래 내역 조회] 내역 조회에 실패하였습니다. account = {}",dto.getAccount());
+                log.error("[계좌 거래 내역 조회] 내역 조회에 실패하였습니다.");
                 return ApiResponse.of(FailureStatusCode.ACCOUNT_HISTORY_FAILED,null);
             }
         }

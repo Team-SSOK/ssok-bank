@@ -5,6 +5,7 @@ import kr.ssok.bank.common.constant.AccountTypeCode;
 import kr.ssok.bank.common.constant.BankCode;
 import kr.ssok.bank.common.exception.BaseException;
 import kr.ssok.bank.common.constant.FailureStatusCode;
+import kr.ssok.bank.common.util.AESUtil;
 import kr.ssok.bank.domain.account.dto.AccountResponseDTO;
 import kr.ssok.bank.domain.account.entity.Account;
 import kr.ssok.bank.domain.account.repository.AccountRepository;
@@ -28,6 +29,7 @@ public class AccountServiceImpl implements AccountService{
 
     private final UserRepository userRepository;
     private final AccountRepository accountRepository;
+    private final AESUtil aesUtil;
 
     // 계좌 생성 메서드
     public Account createAccount(User user, AccountTypeCode accountTypeCode, Good good) throws BaseException {
@@ -37,7 +39,7 @@ public class AccountServiceImpl implements AccountService{
             // 계좌 생성 시 빌더 패턴을 사용
             Account account = Account.builder()
                     .accountTypeCode(accountTypeCode)
-                    .accountNumber(generateAccountNumber(accountTypeCode))
+                    .accountNumber(aesUtil.encrypt(generateAccountNumber(accountTypeCode)))
                     .balance(0L) // 초기 잔액 0
                     .bankCode(BankCode.SSOK_BANK) // 은행 코드 처리
                     .accountStatusCode(AccountStatusCode.ACTIVE) // 기본 활성
@@ -59,7 +61,9 @@ public class AccountServiceImpl implements AccountService{
 
     @Override
     public Account getAccountByAccountNumber(String accountNumber) throws BaseException {
-        return this.accountRepository.findAccountByAccountNumber(accountNumber).orElseThrow(()->
+        String encryptedAccountNumber = aesUtil.encrypt(accountNumber);
+
+        return this.accountRepository.findAccountByAccountNumber(encryptedAccountNumber).orElseThrow(()->
                 new BaseException(FailureStatusCode.ACCOUNT_NOT_FOUND)
         );
     }
@@ -85,7 +89,7 @@ public class AccountServiceImpl implements AccountService{
                     LocalDate createdAt = (account.getCreatedAt() != null) ? account.getCreatedAt().toLocalDate() : LocalDate.now();
 
                     return AccountResponseDTO.builder()
-                            .accountNumber(account.getAccountNumber())
+                            .accountNumber(aesUtil.decrypt(account.getAccountNumber()))
                             .balance(account.getBalance())
                             .bankCode(account.getBankCode().getIdx())
                             .accountStatusCode(account.getAccountStatusCode().getIdx())
@@ -105,7 +109,9 @@ public class AccountServiceImpl implements AccountService{
     // 휴면 계좌 여부 확인 메서드
     @Override
     public boolean isAccountDormant(String accountNumber) {
-        Account account = accountRepository.findAccountByAccountNumber(accountNumber)
+        String encryptedAccountNumber = aesUtil.encrypt(accountNumber);
+
+        Account account = accountRepository.findAccountByAccountNumber(encryptedAccountNumber)
                 .orElseThrow(() -> new BaseException(FailureStatusCode.ACCOUNT_NOT_FOUND));
 
         return account.isDormant();
