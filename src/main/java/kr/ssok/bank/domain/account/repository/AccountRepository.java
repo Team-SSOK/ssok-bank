@@ -1,6 +1,7 @@
 package kr.ssok.bank.domain.account.repository;
 
 import jakarta.persistence.LockModeType;
+import kr.ssok.bank.common.constant.AccountStatusCode;
 import kr.ssok.bank.domain.account.entity.Account;
 import kr.ssok.bank.domain.user.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -17,6 +18,7 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
     List<Account> findAllByUser(User user);
     boolean existsByAccountNumber(String accountNumber);
     Optional<Account> findAccountByAccountNumber(String accountNumber);
+    List<Account> findByAccountStatusCodeAndBalanceGreaterThan(AccountStatusCode statusCode, Long minBalance);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT a FROM Account a WHERE a.accountNumber = :accountNumber")
