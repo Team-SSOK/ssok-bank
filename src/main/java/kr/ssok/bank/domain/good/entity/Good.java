@@ -36,6 +36,6 @@ public class Good extends TimeStamp {
     @Column(name = "interest_cycle", nullable = false)
     private Integer interestCycle; // 이자 지급 주기 (일 단위, 예: 30 = 매월)
 
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "good", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Account> accounts = new ArrayList<>();
 }
