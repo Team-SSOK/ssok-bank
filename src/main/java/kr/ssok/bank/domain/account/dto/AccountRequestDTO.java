@@ -12,4 +12,5 @@ public class AccountRequestDTO {
     private AccountTypeCode accountTypeCode; // 계좌 유형 코드
     private UserTypeCode userTypeCode; //사용자 유형 코드
     private BankCode bankCode; // 은행 코드
+    private String accountNumber; // 계좌 번호
 }
