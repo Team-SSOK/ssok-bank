@@ -176,10 +176,10 @@ public class AccountController {
     }
 
     @Operation(summary = "예금주명 조회", description = "요청받은 계좌번호의 예금주명을 조회 합니다.")
-    @GetMapping("/account/owner")
+    @PostMapping("/account/owner")
     public ApiResponse<AccountOwnerCheckResponseDTO> getUserAccounts(@RequestBody AccountOwnerCheckRequestDTO dto)
     {
-        log.info("[GET] /account/owner - 예금주명 조회: accountNumber = {}", dto.getAccount());
+        log.info("[POST] /account/owner - 예금주명 조회: accountNumber = {}", dto.getAccount());
         Account account = this.accountService.getAccountByAccountNumber(dto.getAccount());
 
         //해당 계좌번호의 계좌가 존재하는지 확인
@@ -215,7 +215,7 @@ public class AccountController {
     @PostMapping("/account/valid")
     public ApiResponse<AccountValidRequestDTO> checkAccountValidation(@RequestBody AccountValidRequestDTO dto)
     {
-        log.info("[GET] /account/valid - 계좌 유효성 검사: username = {}, accountNumber = {}",dto.getUsername(), dto.getAccount());
+        log.info("[POST] /account/valid - 계좌 유효성 검사: username = {}, accountNumber = {}",dto.getUsername(), dto.getAccount());
         try
         {
             Account account = this.accountService.getAccountByAccountNumber(dto.getAccount());
@@ -238,10 +238,10 @@ public class AccountController {
     }
 
     @Operation(summary = "계좌 잔액 및 송금 한도 검사", description = "계좌에서 송금 처리가 가능한지를 확인합니다. (잔액 부족, 출금 한도 확인)")
-    @GetMapping("/account/transferable")
+    @PostMapping("/account/transferable")
     public ApiResponse<AccountTransferableCheckResponseDTO> checkTransferableAccount(@RequestBody AccountTransferableCheckRequestDTO dto)
     {
-        log.info("[GET] /account/transferable - 계좌 잔액 및 송금 한도 검사: username = {}, accountNumber = {}, transferAmount = {}",dto.getUsername(), dto.getAccount(), dto.getTransferAmount());
+        log.info("[POST] /account/transferable - 계좌 잔액 및 송금 한도 검사: username = {}, accountNumber = {}, transferAmount = {}",dto.getUsername(), dto.getAccount(), dto.getTransferAmount());
         try
         {
             Account account = this.accountService.getAccountByAccountNumber(dto.getAccount());
@@ -288,10 +288,10 @@ public class AccountController {
     }
 
     @Operation(summary = "계좌 잔액 확인", description = "계좌에서 잔액을 확인합니다.")
-    @GetMapping("/account/balance")
+    @PostMapping("/account/balance")
     public ApiResponse<AccountBalanceResponseDTO> checkAccountBalance(@RequestBody AccountBalanceRequestDTO dto)
     {
-        log.info("[GET] /account/balance - 계좌 잔액 확인: accountNumber = {}", dto.getAccount());
+        log.info("[POST] /account/balance - 계좌 잔액 확인: accountNumber = {}", dto.getAccount());
         try
         {
             Optional<Account> accountOpt = Optional.ofNullable(this.accountService.getAccountByAccountNumber(dto.getAccount()));
@@ -313,10 +313,10 @@ public class AccountController {
     }
 
     @Operation(summary = "계좌 거래 내역 조회", description = "단일 계좌에 대한 거래 내역을 조회합니다.")
-    @GetMapping("/account/history")
+    @PostMapping("/account/history")
     public ApiResponse<List<AccountTransferHistoryResponseDTO>> getTransferHistory(@RequestBody AccountTransferHistoryRequestDTO dto)
     {
-        log.info("[GET] /account/history - 계좌 거래 내역 조회: accountNumber = {}", dto.getAccount());
+        log.info("[POST] /account/history - 계좌 거래 내역 조회: accountNumber = {}", dto.getAccount());
         try
         {
             Optional<Account> accountOpt = Optional.ofNullable(this.accountService.getAccountByAccountNumber(dto.getAccount()));
