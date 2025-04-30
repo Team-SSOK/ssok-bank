@@ -10,6 +10,8 @@ import kr.ssok.bank.common.response.ApiResponse;
 import kr.ssok.bank.domain.account.dto.*;
 import kr.ssok.bank.domain.account.entity.Account;
 import kr.ssok.bank.domain.account.service.AccountService;
+import kr.ssok.bank.domain.good.entity.Good;
+import kr.ssok.bank.domain.good.repository.GoodRepository;
 import kr.ssok.bank.domain.transfer.entity.TransferHistory;
 import kr.ssok.bank.domain.user.dto.UserRequestDTO;
 import kr.ssok.bank.domain.user.entity.User;
@@ -33,6 +35,7 @@ public class AccountController {
 
     private final AccountService accountService;
     private final UserRepository userRepository;
+    private final GoodRepository goodRepository;
     private final UserService userService;
 
     @Operation(summary = "계좌 개설", description = "계좌를 개설합니다.")
@@ -90,7 +93,12 @@ public class AccountController {
             log.info("User found or created successfully: {} - {}", user.getUsername(), user.getPhoneNumber());
 
             // 2. 계좌 개설
-            Account account = accountService.createAccount(user, accountRequest.getAccountTypeCode());
+            // 2-1. 상품 조회 로직 추가 (예금/적금 기본 상품 선택 -> 우선 [기본 예금]으로 생성)
+            Good good = goodRepository.findByAccountTypeCode(accountRequest.getAccountTypeCode())
+                    .orElseThrow(() -> new BaseException(FailureStatusCode.GOOD_READ_FAILED));
+
+            // 2-2. 계좌 개설
+            Account account = accountService.createAccount(user, accountRequest.getAccountTypeCode(), good);
 
             log.info("계좌 개설 성공: {}. Account Number: {}", user.getUsername(), account.getAccountNumber());
 

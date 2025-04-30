@@ -8,6 +8,7 @@ import kr.ssok.bank.common.constant.FailureStatusCode;
 import kr.ssok.bank.domain.account.dto.AccountResponseDTO;
 import kr.ssok.bank.domain.account.entity.Account;
 import kr.ssok.bank.domain.account.repository.AccountRepository;
+import kr.ssok.bank.domain.good.entity.Good;
 import kr.ssok.bank.domain.user.entity.User;
 import kr.ssok.bank.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +30,7 @@ public class AccountServiceImpl implements AccountService{
     private final AccountRepository accountRepository;
 
     // 계좌 생성 메서드
-    public Account createAccount(User user, AccountTypeCode accountTypeCode) throws BaseException {
+    public Account createAccount(User user, AccountTypeCode accountTypeCode, Good good) throws BaseException {
         try {
             log.info("사용자 생성 시작: {}", user.getUsername());
 
@@ -42,6 +43,7 @@ public class AccountServiceImpl implements AccountService{
                     .accountStatusCode(AccountStatusCode.ACTIVE) // 기본 활성
                     .withdrawLimit(300000L) // 출금 한도 30만원
                     .user(user)
+                    .good(good)
                     .build();
 
             log.info("사용자 생성 완료: {}", user.getUsername());
