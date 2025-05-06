@@ -3,6 +3,7 @@ package kr.ssok.bank.domain.transfer.service;
 import kr.ssok.bank.common.constant.FailureStatusCode;
 import kr.ssok.bank.common.constant.TransferTypeCode;
 import kr.ssok.bank.common.exception.BaseException;
+import kr.ssok.bank.common.util.AESUtil;
 import kr.ssok.bank.domain.account.entity.Account;
 import kr.ssok.bank.domain.account.repository.AccountRepository;
 import kr.ssok.bank.domain.transfer.dto.TransferDepositRequestDTO;
@@ -25,12 +26,15 @@ public class TransferServiceImpl implements TransferService{
 
     private final AccountRepository accountRepository;
     private final TransferRepository transferRepository;
+    private final AESUtil aesUtil;
 
     // 출금 이체
     @Transactional
     public void withdraw(TransferWithdrawRequestDTO dto) {
         // 1. 출금 계좌 락 걸고 조회
-        Account withdrawAccount = accountRepository.findWithPessimisticLockByAccountNumber(dto.getWithdrawAccount())
+        // 1-1. 복호화: 출금 계좌번호
+        String decryptedWithdrawAccount = aesUtil.decrypt(dto.getWithdrawAccount());
+        Account withdrawAccount = accountRepository.findWithPessimisticLockByAccountNumber(decryptedWithdrawAccount)
                 .orElseThrow(() -> new BaseException(FailureStatusCode.ACCOUNT_NOT_FOUND));
 
         // 2. 출금 가능 여부 확인 및 처리
@@ -40,9 +44,12 @@ public class TransferServiceImpl implements TransferService{
         withdrawAccount.withdraw(dto.getTransferAmount());
 
         // 3. 출금 내역 기록
+        // 3-1. 복호화: 상대 계좌 (입금 계좌)
+        String decryptedCounterAccount = aesUtil.decrypt(dto.getCounterAccount());
+
         TransferHistory history = TransferHistory.builder()
                 .account(withdrawAccount)
-                .counterpartAccount(dto.getCounterAccount())
+                .counterpartAccount(aesUtil.encrypt(decryptedCounterAccount)) // 암호화해서 저장
                 .transferAmount(dto.getTransferAmount())  // 송금 금액 기록
                 .balanceAfter(withdrawAccount.getBalance())  // 출금 후 잔액 기록
                 .transferTypeCode(TransferTypeCode.WITHDRAW)
@@ -55,41 +62,24 @@ public class TransferServiceImpl implements TransferService{
         accountRepository.save(withdrawAccount);
     }
 
-
-
     // 입금 이체
     @Transactional
     public void deposit(TransferDepositRequestDTO dto) {
         // 1. 입금 계좌 락 걸고 조회
-        /*
-        if(this.lockMap.containsKey(dto.getTransactionId()))
-        {
-
-        }
-        else
-        {
-            Object o = new Object();
-            lockMap.put(dto.getTransactionId(),o);
-
-            synchronized (o)
-            {
-                o.wait();
-
-                o.notifyAll();
-            }
-
-        }*/
-
-        Account depositAccount = accountRepository.findWithPessimisticLockByAccountNumber(dto.getDepositAccount())
+        // 1-1. 복호화: 입금 계좌번호
+        String decryptedDepositAccount = aesUtil.decrypt(dto.getDepositAccount());
+        Account depositAccount = accountRepository.findWithPessimisticLockByAccountNumber(decryptedDepositAccount)
                 .orElseThrow(() -> new BaseException(FailureStatusCode.ACCOUNT_NOT_FOUND));
 
         // 2. 입금 처리
         depositAccount.deposit(dto.getTransferAmount());
 
         // 3. 입금 내역 기록
+        // 3-1. 복호화: 상대 계좌 (출금 계좌)
+        String decryptedCounterAccount = aesUtil.decrypt(dto.getCounterAccount());
         TransferHistory history = TransferHistory.builder()
                 .account(depositAccount)
-                .counterpartAccount(dto.getCounterAccount())
+                .counterpartAccount(aesUtil.encrypt(decryptedCounterAccount))  // 암호화해서 저장
                 .transferAmount(dto.getTransferAmount())  // 송금 금액 기록
                 .balanceAfter(depositAccount.getBalance())  // 입금 후 잔액 기록
                 .transferTypeCode(TransferTypeCode.DEPOSIT)
