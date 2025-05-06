@@ -3,6 +3,7 @@ package kr.ssok.bank.scheduler;
 import kr.ssok.bank.common.constant.AccountStatusCode;
 import kr.ssok.bank.common.constant.CurrencyCode;
 import kr.ssok.bank.common.constant.TransferTypeCode;
+import kr.ssok.bank.common.util.AESUtil;
 import kr.ssok.bank.domain.account.entity.Account;
 import kr.ssok.bank.domain.account.repository.AccountRepository;
 import kr.ssok.bank.domain.good.entity.Good;
@@ -25,6 +26,7 @@ public class InterestScheduler {
 
     private final AccountRepository accountRepository;
     private final TransferRepository transferHistoryRepository;
+    private final AESUtil aesUtil;
 
     // 매일 오전 1시에 실행 (cron 형식: 초 분 시 일 월 요일)
     @Scheduled(cron = "0 0 1 * * *")
@@ -69,11 +71,13 @@ public class InterestScheduler {
                 account.setLastInterestPaidAt(now);
 
                 // 이자 지급 이체 내역 저장
+                String encryptedAccountNumber = aesUtil.encrypt(account.getAccountNumber());
+
                 TransferHistory history = TransferHistory.builder()
                         .account(account)
                         .transactionId("interest-" + now.toString())
                         .transferTypeCode(TransferTypeCode.INTEREST) // 송금 타입
-                        .counterpartAccount(account.getAccountNumber()) // 이체 대상 계좌 번호
+                        .counterpartAccount(encryptedAccountNumber) // 이체 대상 계좌 번호
                         .transferAmount(interestAmount.longValue()) // 이자 금액
                         .currencyCode(CurrencyCode.WON) // 통화 코드
                         .balanceAfter(account.getBalance()) // 이체 후 잔액
@@ -81,7 +85,9 @@ public class InterestScheduler {
 
                 transferHistoryRepository.save(history);
 
-                log.info(">>> {} 계좌에 이자 지급 완료: + {}", account.getAccountNumber(), interestAmount);
+                String maskedAccountNumber = account.getAccountNumber().replaceAll("(\\d{2})\\d+(\\d{2})", "$1****$2");
+                log.info(">>> {} 계좌에 이자 지급 완료: + {}", maskedAccountNumber, interestAmount);
+
             } catch (Exception e) {
                 log.error(">>> {} 계좌 이자 지급 중 오류 발생: {}", account.getAccountNumber(), e.getMessage(), e);
             }
