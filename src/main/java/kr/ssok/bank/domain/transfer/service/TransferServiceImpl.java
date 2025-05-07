@@ -40,14 +40,12 @@ public class TransferServiceImpl implements TransferService{
     @Transactional
     public void withdraw(TransferWithdrawRequestDTO dto) {
         // 1. 출금 계좌 락 걸고 조회
-        // 1-1. 복호화: 출금 계좌번호
+        // 1-1. 암호화: 출금 계좌번호
         log.info("dto.getWithdrawAccount() : " + dto.getWithdrawAccount());
         String encrypted = aesUtil.encrypt(dto.getWithdrawAccount());
         log.info("encrypted : " + encrypted);
-        String decryptedWithdrawAccount = aesUtil.decrypt(encrypted);
-        log.info("decryptedWithdrawAccount : " + decryptedWithdrawAccount);
 
-        Account withdrawAccount = accountRepository.findWithPessimisticLockByAccountNumber(decryptedWithdrawAccount)
+        Account withdrawAccount = accountRepository.findWithPessimisticLockByAccountNumber(encrypted)
                 .orElseThrow(() -> new BaseException(FailureStatusCode.ACCOUNT_NOT_FOUND));
 
         // 2. 출금 가능 여부 확인 및 처리
@@ -57,12 +55,12 @@ public class TransferServiceImpl implements TransferService{
         withdrawAccount.withdraw(dto.getTransferAmount());
 
         // 3. 출금 내역 기록
-        // 3-1. 복호화: 상대 계좌 (입금 계좌)
-        String decryptedCounterAccount = aesUtil.decrypt(dto.getCounterAccount());
+        // 3-1. 암호화: 상대 계좌 (입금 계좌)
+        String encryptedCounterAccount = aesUtil.encrypt(dto.getCounterAccount());
 
         TransferHistory history = TransferHistory.builder()
                 .account(withdrawAccount)
-                .counterpartAccount(aesUtil.encrypt(decryptedCounterAccount)) // 암호화해서 저장
+                .counterpartAccount(encryptedCounterAccount) // 암호화해서 저장
                 .transferAmount(dto.getTransferAmount())  // 송금 금액 기록
                 .balanceAfter(withdrawAccount.getBalance())  // 출금 후 잔액 기록
                 .transferTypeCode(TransferTypeCode.WITHDRAW)
@@ -79,25 +77,24 @@ public class TransferServiceImpl implements TransferService{
     @Transactional
     public void deposit(TransferDepositRequestDTO dto) {
         // 1. 입금 계좌 락 걸고 조회
-        // 1-1. 복호화: 입금 계좌번호
+        // 1-1. 암호화: 입금 계좌번호
         log.info("dto.getDepositAccount() : " + dto.getDepositAccount());
         String encrypted = aesUtil.encrypt(dto.getDepositAccount());
         log.info("encrypted : " + encrypted);
-        String decryptedDepositAccount = aesUtil.decrypt(encrypted);
-        log.info("decryptedDepositAccount : " + decryptedDepositAccount);
 
-        Account depositAccount = accountRepository.findWithPessimisticLockByAccountNumber(decryptedDepositAccount)
+        Account depositAccount = accountRepository.findWithPessimisticLockByAccountNumber(encrypted)
                 .orElseThrow(() -> new BaseException(FailureStatusCode.ACCOUNT_NOT_FOUND));
 
         // 2. 입금 처리
         depositAccount.deposit(dto.getTransferAmount());
 
         // 3. 입금 내역 기록
-        // 3-1. 복호화: 상대 계좌 (출금 계좌)
-        String decryptedCounterAccount = aesUtil.decrypt(dto.getCounterAccount());
+        // 3-1. 암호화: 상대 계좌 (출금 계좌)
+        String encryptedCounterAccount = aesUtil.encrypt(dto.getCounterAccount());
+
         TransferHistory history = TransferHistory.builder()
                 .account(depositAccount)
-                .counterpartAccount(aesUtil.encrypt(decryptedCounterAccount))  // 암호화해서 저장
+                .counterpartAccount(encryptedCounterAccount)  // 암호화해서 저장
                 .transferAmount(dto.getTransferAmount())  // 송금 금액 기록
                 .balanceAfter(depositAccount.getBalance())  // 입금 후 잔액 기록
                 .transferTypeCode(TransferTypeCode.DEPOSIT)
