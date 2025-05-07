@@ -7,6 +7,7 @@ import kr.ssok.bank.common.constant.SuccessStatusCode;
 import kr.ssok.bank.common.constant.UserTypeCode;
 import kr.ssok.bank.common.exception.BaseException;
 import kr.ssok.bank.common.response.ApiResponse;
+import kr.ssok.bank.common.util.AESUtil;
 import kr.ssok.bank.domain.account.dto.*;
 import kr.ssok.bank.domain.account.entity.Account;
 import kr.ssok.bank.domain.account.service.AccountService;
@@ -20,7 +21,10 @@ import kr.ssok.bank.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,6 +41,7 @@ public class AccountController {
     private final UserRepository userRepository;
     private final GoodRepository goodRepository;
     private final UserService userService;
+    private final AESUtil aesUtil;
 
     @Operation(summary = "계좌 개설", description = "계좌를 개설합니다.")
     @PostMapping("/account")
@@ -226,7 +231,7 @@ public class AccountController {
             Account account = this.accountService.getAccountByAccountNumber(dto.getAccount());
             Optional<User> userOpt = Optional.ofNullable(account.getUser());
             //해당 계좌의 사용자가 존재하는지 확인
-            if (userOpt.isPresent() && dto.getAccount().equals(account.getAccountNumber()) && dto.getUsername().equals(userOpt.get().getUsername())) {
+            if (userOpt.isPresent() && dto.getAccount().equals(this.aesUtil.decrypt(account.getAccountNumber())) && dto.getUsername().equals(userOpt.get().getUsername())) {
                 log.info("[계좌 유효성 검사] 계좌 유효성 확인 성공. account = {}, username = {}", dto.getAccount(), userOpt.get().getUsername());
                 return ApiResponse.of(SuccessStatusCode.ACCOUNT_VALIDATION_OK,null);
             }
