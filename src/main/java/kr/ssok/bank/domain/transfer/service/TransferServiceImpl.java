@@ -39,6 +39,11 @@ public class TransferServiceImpl implements TransferService{
     // 출금 이체
     @Transactional
     public void withdraw(TransferWithdrawRequestDTO dto) {
+        // 0. 중복 transactionId 방지
+        if (transferRepository.existsByTransactionIdAndTransferTypeCode(dto.getTransactionId(), TransferTypeCode.WITHDRAW)) {
+            throw new BaseException(FailureStatusCode.DUPLICATED_TRANSACTION_ID);
+        }
+
         // 1. 출금 계좌 락 걸고 조회
         // 1-1. 암호화: 출금 계좌번호
         log.info("dto.getWithdrawAccount() : " + dto.getWithdrawAccount());
@@ -76,8 +81,19 @@ public class TransferServiceImpl implements TransferService{
     // 입금 이체
     @Transactional
     public void deposit(TransferDepositRequestDTO dto) {
-        // 1. 입금 계좌 락 걸고 조회
-        // 1-1. 암호화: 입금 계좌번호
+        // 0. 중복 transactionId 방지
+        if (transferRepository.existsByTransactionIdAndTransferTypeCode(dto.getTransactionId(), TransferTypeCode.DEPOSIT)) {
+            throw new BaseException(FailureStatusCode.DUPLICATED_TRANSACTION_ID);
+        }
+
+        // 1. 선출금 내역 존재 확인
+        boolean withdrawExists = transferRepository.existsByTransactionIdAndTransferTypeCode(dto.getTransactionId(), TransferTypeCode.WITHDRAW);
+        if (!withdrawExists) {
+            throw new BaseException(FailureStatusCode.MISSING_WITHDRAW_FOR_DEPOSIT);
+        }
+
+        // 2. 입금 계좌 락 걸고 조회
+        // 2-1. 암호화: 입금 계좌번호
         log.info("dto.getDepositAccount() : " + dto.getDepositAccount());
         String encrypted = aesUtil.encrypt(dto.getDepositAccount());
         log.info("encrypted : " + encrypted);
@@ -85,11 +101,11 @@ public class TransferServiceImpl implements TransferService{
         Account depositAccount = accountRepository.findWithPessimisticLockByAccountNumber(encrypted)
                 .orElseThrow(() -> new BaseException(FailureStatusCode.ACCOUNT_NOT_FOUND));
 
-        // 2. 입금 처리
+        // 3. 입금 처리
         depositAccount.deposit(dto.getTransferAmount());
 
-        // 3. 입금 내역 기록
-        // 3-1. 암호화: 상대 계좌 (출금 계좌)
+        // 4. 입금 내역 기록
+        // 4-1. 암호화: 상대 계좌 (출금 계좌)
         String encryptedCounterAccount = aesUtil.encrypt(dto.getCounterAccount());
 
         TransferHistory history = TransferHistory.builder()
@@ -104,7 +120,7 @@ public class TransferServiceImpl implements TransferService{
 
         transferRepository.save(history);
 
-        // 4. 변경된 계좌 저장
+        // 5. 변경된 계좌 저장
         accountRepository.save(depositAccount);
     }
 }
