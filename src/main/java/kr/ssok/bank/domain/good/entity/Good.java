@@ -23,7 +23,7 @@ public class Good extends TimeStamp {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long goodId;
 
-    @Column(name = "name")
+    @Column(name = "name", unique = true)
     private String name; // 상품명
 
     @Enumerated(EnumType.STRING)
