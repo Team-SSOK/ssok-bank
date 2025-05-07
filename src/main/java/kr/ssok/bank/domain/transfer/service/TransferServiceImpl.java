@@ -105,7 +105,10 @@ public class TransferServiceImpl implements TransferService{
     public void withdraw(TransferWithdrawRequestDTO dto) {
         // 1. 출금 계좌 락 걸고 조회
         // 1-1. 복호화: 출금 계좌번호
+        log.info("dto.getWithdrawAccount() : " + dto.getWithdrawAccount());
         String decryptedWithdrawAccount = aesUtil.decrypt(dto.getWithdrawAccount());
+        log.info("decryptedWithdrawAccount : " + decryptedWithdrawAccount);
+
         Account withdrawAccount = accountRepository.findWithPessimisticLockByAccountNumber(decryptedWithdrawAccount)
                 .orElseThrow(() -> new BaseException(FailureStatusCode.ACCOUNT_NOT_FOUND));
 
