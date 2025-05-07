@@ -54,7 +54,7 @@ public enum FailureStatusCode implements BaseCode {
 
     // 암/복호화 관련 에러
     AES_ENCRYPT_FAILED(HttpStatus.BAD_REQUEST, "AES4001", "계좌 번호 암호화에 실패했습니다."),
-    AES_DECRYPT_FAILED(HttpStatus.BAD_REQUEST, "AES4002", "계좌 번호 복호화에 실패했습니다..");
+    AES_DECRYPT_FAILED(HttpStatus.BAD_REQUEST, "AES4002", "계좌 번호 복호화에 실패했습니다.");
 
     private final HttpStatus httpStatus;
     private final String code;

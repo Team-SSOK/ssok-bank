@@ -42,7 +42,9 @@ public class TransferServiceImpl implements TransferService{
         // 1. 출금 계좌 락 걸고 조회
         // 1-1. 복호화: 출금 계좌번호
         log.info("dto.getWithdrawAccount() : " + dto.getWithdrawAccount());
-        String decryptedWithdrawAccount = aesUtil.decrypt(dto.getWithdrawAccount());
+        String encrypted = aesUtil.encrypt(dto.getWithdrawAccount());
+        log.info("encrypted : " + encrypted);
+        String decryptedWithdrawAccount = aesUtil.decrypt(encrypted);
         log.info("decryptedWithdrawAccount : " + decryptedWithdrawAccount);
 
         Account withdrawAccount = accountRepository.findWithPessimisticLockByAccountNumber(decryptedWithdrawAccount)
@@ -78,7 +80,12 @@ public class TransferServiceImpl implements TransferService{
     public void deposit(TransferDepositRequestDTO dto) {
         // 1. 입금 계좌 락 걸고 조회
         // 1-1. 복호화: 입금 계좌번호
-        String decryptedDepositAccount = aesUtil.decrypt(dto.getDepositAccount());
+        log.info("dto.getDepositAccount() : " + dto.getDepositAccount());
+        String encrypted = aesUtil.encrypt(dto.getDepositAccount());
+        log.info("encrypted : " + encrypted);
+        String decryptedDepositAccount = aesUtil.decrypt(encrypted);
+        log.info("decryptedDepositAccount : " + decryptedDepositAccount);
+
         Account depositAccount = accountRepository.findWithPessimisticLockByAccountNumber(decryptedDepositAccount)
                 .orElseThrow(() -> new BaseException(FailureStatusCode.ACCOUNT_NOT_FOUND));
 
