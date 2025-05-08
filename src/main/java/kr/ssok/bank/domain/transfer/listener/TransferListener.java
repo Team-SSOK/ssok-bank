@@ -1,6 +1,7 @@
 package kr.ssok.bank.domain.transfer.listener;
 
 import kr.ssok.bank.common.comm.CommunicationProtocol;
+import kr.ssok.bank.common.comm.JsonUtil;
 import kr.ssok.bank.common.constant.FailureStatusCode;
 import kr.ssok.bank.common.constant.SuccessStatusCode;
 import kr.ssok.bank.common.exception.BaseException;
@@ -41,7 +42,7 @@ public class TransferListener {
      */
     @KafkaListener(topics = "${spring.kafka.request-topic}", groupId = "request-server-group", containerFactory = "kafkaListenerReplyContainerFactory")
     @SendTo // 응답은 헤더에 지정된 replyTopic으로 전송됨
-    public Object handleTransferRequest(ConsumerRecord<String, Object> record,
+    public String handleTransferRequest(ConsumerRecord<String, String> record,
                                         @Header(KafkaHeaders.REPLY_TOPIC) String replyTopic,
                                         @Header(KafkaHeaders.CORRELATION_ID) String correlationId,
                                         @Header(value = "CMD", required = false) String cmd) {
@@ -54,17 +55,17 @@ public class TransferListener {
         if (cmd == null) {
             log.info("Transfer ERROR : {}", record);
             ApiResponse<String> response = ApiResponse.of(FailureStatusCode._INTERNAL_SERVER_ERROR, null);
-            return response;
+            return JsonUtil.toJson(response);
         }
         try {
             switch (cmd) {
                 case CommunicationProtocol.REQUEST_WITHDRAW: // 출금
                     log.info("REQUEST_WITHDRAW : {}", record);
 
-                    TransferWithdrawRequestDTO withdrawDTO = mapper.map(record.value(), TransferWithdrawRequestDTO.class);
+                    TransferWithdrawRequestDTO withdrawDTO = JsonUtil.fromJson(record.value(), TransferWithdrawRequestDTO.class);
                     transferService.withdraw(withdrawDTO);
 
-                    return ApiResponse.of(SuccessStatusCode.TRANSFER_WITHDRAW_OK, null);
+                    return ApiResponse.ofJson(SuccessStatusCode.TRANSFER_WITHDRAW_OK, null);
 
                 case CommunicationProtocol.REQUEST_DEPOSIT: // 입금
                     log.info("REQUEST_DEPOSIT : {}", record);
@@ -72,7 +73,7 @@ public class TransferListener {
                     TransferDepositRequestDTO depositDTO = mapper.map(record.value(), TransferDepositRequestDTO.class);
                     transferService.deposit(depositDTO);
 
-                    return ApiResponse.of(SuccessStatusCode.TRANSFER_DEPOSIT_OK, null);
+                    return ApiResponse.ofJson(SuccessStatusCode.TRANSFER_DEPOSIT_OK, null);
 
                 case CommunicationProtocol.REQUEST_COMPENSATE: // 보상
                     log.info("REQUEST_COMPENSATE : {}", record);
@@ -80,14 +81,14 @@ public class TransferListener {
                     CompensateRequestDTO compensateDTO = mapper.map(record.value(), CompensateRequestDTO.class);
                     transferService.compensate(compensateDTO);
 
-                    return ApiResponse.of(SuccessStatusCode.TRANSFER_COMPENSATE_OK, null);
+                    return ApiResponse.ofJson(SuccessStatusCode.TRANSFER_COMPENSATE_OK, null);
             }
         } catch (BaseException e) {
-            return ApiResponse.of(e.getStatus(), null);
+            return ApiResponse.ofJson(e.getStatus(), null);
         } catch (Exception e) {
-            return ApiResponse.of(FailureStatusCode._INTERNAL_SERVER_ERROR, null);
+            return ApiResponse.ofJson(FailureStatusCode._INTERNAL_SERVER_ERROR, null);
         }
-        return ApiResponse.of(FailureStatusCode._INTERNAL_SERVER_ERROR, null);
+        return ApiResponse.ofJson(FailureStatusCode._INTERNAL_SERVER_ERROR, null);
 
     }
 
@@ -100,7 +101,7 @@ public class TransferListener {
      */
     @KafkaListener(topics = "${spring.kafka.push-topic}", containerFactory = "kafkaListenerUnidirectionalContainerFactory")
     public void receiveMessage(@Header(value = "CMD", required = false) String cmd,
-                               ConsumerRecord<String, Object> record) {
+                               ConsumerRecord<String, String> record) {
         log.info("Received unidirectional message in bank service: {}", record.value());
         log.info("Received CMD: {}", cmd);
 
