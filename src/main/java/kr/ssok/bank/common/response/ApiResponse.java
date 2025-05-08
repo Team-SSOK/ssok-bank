@@ -3,6 +3,7 @@ package kr.ssok.bank.common.response;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import kr.ssok.bank.common.comm.JsonUtil;
 import kr.ssok.bank.common.constant.FailureStatusCode;
 import kr.ssok.bank.common.constant.SuccessStatusCode;
 import lombok.AllArgsConstructor;
@@ -23,6 +24,11 @@ public class ApiResponse<T> {
     // 코드 사용
     public static <T> ApiResponse<T> of(BaseCode code, T result){
         return new ApiResponse<>(code instanceof SuccessStatusCode, code.getReasonHttpStatus().getCode() , code.getReasonHttpStatus().getMessage(), result);
+    }
+
+    // of 메서드의 결과 값을 Json string 으로 변환
+    public static <T> String ofJson(BaseCode code, T result){
+        return JsonUtil.toJson(new ApiResponse<>(code instanceof SuccessStatusCode, code.getReasonHttpStatus().getCode() , code.getReasonHttpStatus().getMessage(), result));
     }
 
     // 성공한 경우 응답 생성
