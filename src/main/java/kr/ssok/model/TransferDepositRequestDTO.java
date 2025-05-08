@@ -1,4 +1,4 @@
-package kr.ssok.bank.domain.transfer.dto;
+package kr.ssok.model;
 
 import kr.ssok.bank.common.constant.BankCode;
 import kr.ssok.bank.common.constant.CurrencyCode;

@@ -5,9 +5,9 @@ import kr.ssok.bank.common.constant.FailureStatusCode;
 import kr.ssok.bank.common.constant.SuccessStatusCode;
 import kr.ssok.bank.common.exception.BaseException;
 import kr.ssok.bank.common.response.ApiResponse;
-import kr.ssok.bank.domain.transfer.dto.CompensateRequestDTO;
-import kr.ssok.bank.domain.transfer.dto.TransferDepositRequestDTO;
-import kr.ssok.bank.domain.transfer.dto.TransferWithdrawRequestDTO;
+import kr.ssok.model.CompensateRequestDTO;
+import kr.ssok.model.TransferDepositRequestDTO;
+import kr.ssok.model.TransferWithdrawRequestDTO;
 import kr.ssok.bank.domain.transfer.service.TransferService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,7 +18,6 @@ import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Component
