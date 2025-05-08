@@ -11,7 +11,9 @@ public enum TransferTypeCode {
     // 출금
     WITHDRAW(1,"WITHDRAW"),
     // 이자
-    INTEREST(2, "INTEREST");
+    INTEREST(2, "INTEREST"),
+    // 보상
+    COMPENSATE(3,"COMPENSATE");
 
     private final int idx;
     private final String value;

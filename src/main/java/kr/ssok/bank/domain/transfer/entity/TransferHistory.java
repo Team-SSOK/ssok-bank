@@ -2,6 +2,7 @@ package kr.ssok.bank.domain.transfer.entity;
 
 import jakarta.persistence.*;
 import kr.ssok.bank.common.constant.CurrencyCode;
+import kr.ssok.bank.common.constant.TransferStatusCode;
 import kr.ssok.bank.common.constant.TransferTypeCode;
 import kr.ssok.bank.common.entity.TimeStamp;
 import kr.ssok.bank.domain.account.entity.Account;
@@ -9,6 +10,7 @@ import lombok.*;
 
 @Entity
 @Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -30,6 +32,11 @@ public class TransferHistory extends TimeStamp {
     @Enumerated(EnumType.STRING)
     @Column(name = "transfer_type", nullable = false)
     private TransferTypeCode transferTypeCode;
+
+    // 송금 상태
+    @Enumerated(EnumType.STRING)
+    @Column(name = "transfer_status", nullable = false)
+    private TransferStatusCode transferStatusCode;
 
     // 상대 계좌 ID
     @Column(name = "counterpart_account", nullable = false)

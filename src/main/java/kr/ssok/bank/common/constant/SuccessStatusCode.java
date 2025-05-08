@@ -18,6 +18,7 @@ public enum SuccessStatusCode implements BaseCode {
     TRANSFER_WITHDRAW_OK(HttpStatus.OK, "TRANSFER2002", "출금 이체에 성공하였습니다."),
     TRANSFER_DEPOSIT_OK(HttpStatus.OK, "TRANSFER2003", "입금 이체에 성공하였습니다."),
     TRANSFER_AVAILABLE(HttpStatus.OK, "ACCOUNT2008", "해당 계좌는 송금 처리 가능합니다."),
+    TRANSFER_COMPENSATE_OK(HttpStatus.OK, "ACCOUNT2009", "해당 계좌 보상 처리에 성공했습니다."),
 
     //유저 관련
     USER_FOUND_OK(HttpStatus.OK, "USER2001", "사용자를 찾았습니다."),
