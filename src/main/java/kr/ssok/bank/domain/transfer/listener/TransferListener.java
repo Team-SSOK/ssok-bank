@@ -5,6 +5,7 @@ import kr.ssok.bank.common.constant.FailureStatusCode;
 import kr.ssok.bank.common.constant.SuccessStatusCode;
 import kr.ssok.bank.common.exception.BaseException;
 import kr.ssok.bank.common.response.ApiResponse;
+import kr.ssok.bank.domain.transfer.dto.CompensateRequestDTO;
 import kr.ssok.bank.domain.transfer.dto.TransferDepositRequestDTO;
 import kr.ssok.bank.domain.transfer.dto.TransferWithdrawRequestDTO;
 import kr.ssok.bank.domain.transfer.service.TransferService;
@@ -57,7 +58,15 @@ public class TransferListener {
         }
         try {
             switch (cmd) {
-                case CommunicationProtocol.REQUEST_DEPOSIT:
+                case CommunicationProtocol.REQUEST_WITHDRAW: // 출금
+                    log.info("REQUEST_WITHDRAW : {}", record);
+
+                    TransferWithdrawRequestDTO withdrawDTO = mapper.map(record.value(), TransferWithdrawRequestDTO.class);
+                    transferService.withdraw(withdrawDTO);
+
+                    return ApiResponse.of(SuccessStatusCode.TRANSFER_WITHDRAW_OK, null);
+
+                case CommunicationProtocol.REQUEST_DEPOSIT: // 입금
                     log.info("REQUEST_DEPOSIT : {}", record);
 
                     TransferDepositRequestDTO depositDTO = mapper.map(record.value(), TransferDepositRequestDTO.class);
@@ -65,13 +74,13 @@ public class TransferListener {
 
                     return ApiResponse.of(SuccessStatusCode.TRANSFER_DEPOSIT_OK, null);
 
-                case CommunicationProtocol.REQUEST_WITHDRAW:
-                    log.info("REQUEST_WITHDRAW : {}", record);
+                case CommunicationProtocol.REQUEST_COMPENSATE: // 보상
+                    log.info("REQUEST_COMPENSATE : {}", record);
 
-                    TransferWithdrawRequestDTO withdrawDTO = mapper.map(record.value(), TransferWithdrawRequestDTO.class);
-                    transferService.withdraw(withdrawDTO);
+                    CompensateRequestDTO compensateDTO = mapper.map(record.value(), CompensateRequestDTO.class);
+                    transferService.compensate(compensateDTO);
 
-                    return ApiResponse.of(SuccessStatusCode.TRANSFER_WITHDRAW_OK, null);
+                    return ApiResponse.of(SuccessStatusCode.TRANSFER_COMPENSATE_OK, null);
             }
         } catch (BaseException e) {
             return ApiResponse.of(e.getStatus(), null);

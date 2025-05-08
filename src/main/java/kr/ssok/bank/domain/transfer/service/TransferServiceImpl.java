@@ -2,11 +2,13 @@ package kr.ssok.bank.domain.transfer.service;
 
 import kr.ssok.bank.common.comm.CommunicationProtocol;
 import kr.ssok.bank.common.constant.FailureStatusCode;
+import kr.ssok.bank.common.constant.TransferStatusCode;
 import kr.ssok.bank.common.constant.TransferTypeCode;
 import kr.ssok.bank.common.exception.BaseException;
 import kr.ssok.bank.common.util.AESUtil;
 import kr.ssok.bank.domain.account.entity.Account;
 import kr.ssok.bank.domain.account.repository.AccountRepository;
+import kr.ssok.bank.domain.transfer.dto.CompensateRequestDTO;
 import kr.ssok.bank.domain.transfer.dto.TransferDepositRequestDTO;
 import kr.ssok.bank.domain.transfer.dto.TransferWithdrawRequestDTO;
 import kr.ssok.bank.domain.transfer.entity.TransferHistory;
@@ -69,6 +71,7 @@ public class TransferServiceImpl implements TransferService{
                 .transferAmount(dto.getTransferAmount())  // 송금 금액 기록
                 .balanceAfter(withdrawAccount.getBalance())  // 출금 후 잔액 기록
                 .transferTypeCode(TransferTypeCode.WITHDRAW)
+                .transferStatusCode(TransferStatusCode.SUCCESS)
                 .currencyCode(dto.getCurrencyCode())
                 .transactionId(dto.getTransactionId())
                 .build();
@@ -114,6 +117,7 @@ public class TransferServiceImpl implements TransferService{
                 .transferAmount(dto.getTransferAmount())  // 송금 금액 기록
                 .balanceAfter(depositAccount.getBalance())  // 입금 후 잔액 기록
                 .transferTypeCode(TransferTypeCode.DEPOSIT)
+                .transferStatusCode(TransferStatusCode.SUCCESS)
                 .currencyCode(dto.getCurrencyCode())
                 .transactionId(dto.getTransactionId())
                 .build();
@@ -122,5 +126,44 @@ public class TransferServiceImpl implements TransferService{
 
         // 5. 변경된 계좌 저장
         accountRepository.save(depositAccount);
+    }
+
+    // 보상 처리
+    @Transactional
+    public void compensate(CompensateRequestDTO compensateRequestDTO) {
+        // 1. 실패한 출금 내역을 찾는다.
+        TransferHistory failedWithdrawal
+                = transferRepository.findByTransactionIdAndTransferTypeCode(compensateRequestDTO.getTransactionId(), TransferTypeCode.WITHDRAW)
+                .orElseThrow(() -> new BaseException(FailureStatusCode.TRANSACTION_NOT_EXISTS));
+
+        // 2. 이미 보상 처리된 경우, 예외 처리
+        if (failedWithdrawal.getTransferStatusCode() == TransferStatusCode.COMPENSATED) {
+            throw new BaseException(FailureStatusCode.TRANSFER_ALREADY_COMPENSATED);
+        }
+
+        // 3. 출금 계좌 찾기
+        Account account = failedWithdrawal.getAccount();
+
+        // 4. 보상 처리 (입금)
+        account.deposit(failedWithdrawal.getTransferAmount()); // 실패한 금액을 다시 입금
+
+        // 5. 보상 처리 후 TransferHistory에 보상 내역 추가
+        transferRepository.save(TransferHistory.builder()
+                .transactionId(compensateRequestDTO.getTransactionId())
+                .transferTypeCode(TransferTypeCode.COMPENSATE)
+                .counterpartAccount("SYSTEM")
+                .transferAmount(failedWithdrawal.getTransferAmount())
+                .currencyCode(failedWithdrawal.getCurrencyCode())
+                .balanceAfter(account.getBalance())
+                .account(account)
+                .transferStatusCode(TransferStatusCode.COMPENSATED) // 보상 처리 완료 상태
+                .build());
+
+        // 6. 계좌 정보 저장
+        accountRepository.save(account);
+
+        // 7. 실패했던 출금 내역 상태 업데이트
+        failedWithdrawal.setTransferStatusCode(TransferStatusCode.COMPENSATED); // 상태 변경
+        transferRepository.save(failedWithdrawal);
     }
 }

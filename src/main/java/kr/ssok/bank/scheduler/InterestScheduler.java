@@ -2,6 +2,7 @@ package kr.ssok.bank.scheduler;
 
 import kr.ssok.bank.common.constant.AccountStatusCode;
 import kr.ssok.bank.common.constant.CurrencyCode;
+import kr.ssok.bank.common.constant.TransferStatusCode;
 import kr.ssok.bank.common.constant.TransferTypeCode;
 import kr.ssok.bank.common.util.AESUtil;
 import kr.ssok.bank.domain.account.entity.Account;
@@ -77,6 +78,7 @@ public class InterestScheduler {
                         .account(account)
                         .transactionId("interest-" + now.toString())
                         .transferTypeCode(TransferTypeCode.INTEREST) // 송금 타입
+                        .transferStatusCode(TransferStatusCode.SUCCESS) // 송금 상태 코드
                         .counterpartAccount(encryptedAccountNumber) // 이체 대상 계좌 번호
                         .transferAmount(interestAmount.longValue()) // 이자 금액
                         .currencyCode(CurrencyCode.WON) // 통화 코드
