@@ -28,7 +28,7 @@ public class ApiResponse<T> {
 
     // of 메서드의 결과 값을 Json string 으로 변환
     public static <T> String ofJson(BaseCode code, T result){
-        return JsonUtil.toJson(new ApiResponse<>(code instanceof SuccessStatusCode, code.getReasonHttpStatus().getCode() , code.getReasonHttpStatus().getMessage(), result));
+        return JsonUtil.toJson(of(code, result));
     }
 
     // 성공한 경우 응답 생성
