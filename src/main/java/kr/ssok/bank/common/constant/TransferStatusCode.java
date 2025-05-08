@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public enum TransferStatusCode {
+public enum TransferStatusCode { // 송금 상태 코드
     // 정상
     SUCCESS(0,"SUCCESS"),
     // 실패
