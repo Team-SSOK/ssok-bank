@@ -51,6 +51,8 @@ public class TransferServiceImpl implements TransferService{
 
         // 2. 출금 가능 여부 확인 및 처리
         if (withdrawAccount.getBalance() < dto.getTransferAmount()) {
+            log.error("withdrawAccount.getBalance() > dto.getTransferAmount() : {} > {} "
+                                    , withdrawAccount.getBalance(), dto.getTransferAmount());
             throw new BaseException(FailureStatusCode.TRANSFER_NO_BALANCE);
         }
         withdrawAccount.withdraw(dto.getTransferAmount());
