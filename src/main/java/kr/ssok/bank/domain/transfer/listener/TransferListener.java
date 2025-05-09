@@ -13,13 +13,11 @@ import kr.ssok.bank.domain.transfer.service.TransferService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.modelmapper.ModelMapper;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Component
@@ -27,7 +25,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class TransferListener {
 
     private final TransferService transferService;
-    private final ModelMapper mapper = new ModelMapper();
 
     /**
      * 프로미스 요청에 대한 카프카 리스너
@@ -70,7 +67,7 @@ public class TransferListener {
                 case CommunicationProtocol.REQUEST_DEPOSIT: // 입금
                     log.info("REQUEST_DEPOSIT : {}", record);
 
-                    TransferDepositRequestDTO depositDTO = mapper.map(record.value(), TransferDepositRequestDTO.class);
+                    TransferDepositRequestDTO depositDTO = JsonUtil.fromJson(record.value(), TransferDepositRequestDTO.class);
                     transferService.deposit(depositDTO);
 
                     return ApiResponse.ofJson(SuccessStatusCode.TRANSFER_DEPOSIT_OK, null);
@@ -78,7 +75,7 @@ public class TransferListener {
                 case CommunicationProtocol.REQUEST_COMPENSATE: // 보상
                     log.info("REQUEST_COMPENSATE : {}", record);
 
-                    CompensateRequestDTO compensateDTO = mapper.map(record.value(), CompensateRequestDTO.class);
+                    CompensateRequestDTO compensateDTO = JsonUtil.fromJson(record.value(), CompensateRequestDTO.class);
                     transferService.compensate(compensateDTO);
 
                     return ApiResponse.ofJson(SuccessStatusCode.TRANSFER_COMPENSATE_OK, null);

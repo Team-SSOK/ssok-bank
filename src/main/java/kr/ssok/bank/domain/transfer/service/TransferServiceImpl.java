@@ -1,6 +1,5 @@
 package kr.ssok.bank.domain.transfer.service;
 
-import kr.ssok.bank.common.comm.CommunicationProtocol;
 import kr.ssok.bank.common.constant.FailureStatusCode;
 import kr.ssok.bank.common.constant.TransferStatusCode;
 import kr.ssok.bank.common.constant.TransferTypeCode;
@@ -15,11 +14,6 @@ import kr.ssok.bank.domain.transfer.entity.TransferHistory;
 import kr.ssok.bank.domain.transfer.repository.TransferRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.springframework.kafka.annotation.KafkaListener;
-import org.springframework.kafka.support.KafkaHeaders;
-import org.springframework.messaging.handler.annotation.Header;
-import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

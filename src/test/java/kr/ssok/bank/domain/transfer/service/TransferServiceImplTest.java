@@ -3,7 +3,6 @@ package kr.ssok.bank.domain.transfer.service;
 import kr.ssok.bank.common.constant.BankCode;
 import kr.ssok.bank.common.constant.CurrencyCode;
 import kr.ssok.bank.common.constant.FailureStatusCode;
-import kr.ssok.bank.common.constant.TransferTypeCode;
 import kr.ssok.bank.common.exception.BaseException;
 import kr.ssok.bank.domain.account.entity.Account;
 import kr.ssok.bank.domain.account.repository.AccountRepository;
@@ -11,7 +10,6 @@ import kr.ssok.bank.domain.transfer.dto.TransferDepositRequestDTO;
 import kr.ssok.bank.domain.transfer.dto.TransferWithdrawRequestDTO;
 import kr.ssok.bank.domain.transfer.entity.TransferHistory;
 import kr.ssok.bank.domain.transfer.repository.TransferRepository;
-import kr.ssok.bank.domain.transfer.service.TransferServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
@@ -20,7 +18,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.Optional;
 
