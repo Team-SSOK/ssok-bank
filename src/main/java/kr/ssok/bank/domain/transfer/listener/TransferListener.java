@@ -131,13 +131,14 @@ public class TransferListener {
 
     /**
      * 타임 아웃 확인 메서드
-     *
-     * @param messageCreatedAt    통신 프로토콜
-     * @param  10초 이상 차이 여부
+     * @param messageCreatedAt 메세지가 생성된 타임스탬프
+     * @return
      */
     private boolean isExpired(Long messageCreatedAt) {
         if (messageCreatedAt == null) return true; // null이면 무조건 실패 처리
         long currentTime = System.currentTimeMillis();
-        return (currentTime - messageCreatedAt) > 10000L; // 10초
+        long diff = currentTime - messageCreatedAt;
+        log.info("요청 발생 후 도착까지 걸린 시간: {}ms", diff);
+        return diff > 10000L; // 10초
     }
 }
