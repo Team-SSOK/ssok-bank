@@ -13,4 +13,5 @@ public class TransferWithdrawRequestDTO {
     private CurrencyCode currencyCode; // 통화 코드
     private String counterAccount; // 입금 계좌
     private BankCode counterBankCode; // 입금 은행 코드
+    private Long messageCreatedAt; // 메세지 생성 시간
 }
