@@ -60,6 +60,12 @@ public class TransferListener {
                     log.info("REQUEST_WITHDRAW : {}", record);
 
                     TransferWithdrawRequestDTO withdrawDTO = JsonUtil.fromJson(record.value(), TransferWithdrawRequestDTO.class);
+
+                    if (isExpired(withdrawDTO.getMessageCreatedAt())) {
+                        log.warn("Expired withdraw message. Skipping process. transactionId: {}", withdrawDTO.getTransactionId());
+                        return ApiResponse.ofJson(FailureStatusCode.REQUEST_TIMEOUT, null);
+                    }
+
                     transferService.withdraw(withdrawDTO);
 
                     return ApiResponse.ofJson(SuccessStatusCode.TRANSFER_WITHDRAW_OK, null);
@@ -68,6 +74,12 @@ public class TransferListener {
                     log.info("REQUEST_DEPOSIT : {}", record);
 
                     TransferDepositRequestDTO depositDTO = JsonUtil.fromJson(record.value(), TransferDepositRequestDTO.class);
+
+                    if (isExpired(depositDTO.getMessageCreatedAt())) {
+                        log.warn("Expired deposit message. Skipping process. transactionId: {}", depositDTO.getTransactionId());
+                        return ApiResponse.ofJson(FailureStatusCode.REQUEST_TIMEOUT, null);
+                    }
+
                     transferService.deposit(depositDTO);
 
                     return ApiResponse.ofJson(SuccessStatusCode.TRANSFER_DEPOSIT_OK, null);
@@ -117,4 +129,15 @@ public class TransferListener {
         }
     }
 
+    /**
+     * 타임 아웃 확인 메서드
+     *
+     * @param messageCreatedAt    통신 프로토콜
+     * @param  10초 이상 차이 여부
+     */
+    private boolean isExpired(Long messageCreatedAt) {
+        if (messageCreatedAt == null) return true; // null이면 무조건 실패 처리
+        long currentTime = System.currentTimeMillis();
+        return (currentTime - messageCreatedAt) > 10000L; // 10초
+    }
 }

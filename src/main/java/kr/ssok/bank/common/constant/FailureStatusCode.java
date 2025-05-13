@@ -41,6 +41,7 @@ public enum FailureStatusCode implements BaseCode {
     // 거래 관련 에러
     TRANSACTION_NOT_EXISTS(HttpStatus.BAD_REQUEST, "TRANSACTION4002", "거래 내역이 존재하지 않습니다."),
     TRANSACTION_CREATE_FAILED(HttpStatus.BAD_REQUEST, "TRANSACTION4003", "거래 내역 생성에 실패하였습니다."),
+    REQUEST_TIMEOUT(HttpStatus.BAD_REQUEST, "TRANSACTION4004", "거래 내역 처리 중 타임 아웃이 발생하였습니다."),
 
     // 송금 관련 에러
     TRANSFER_FAILED(HttpStatus.BAD_REQUEST, "TRANSFER4001", "송금에 실패하였습니다."),
