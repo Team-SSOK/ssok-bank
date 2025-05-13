@@ -55,13 +55,15 @@ public class TransferListener {
             return JsonUtil.toJson(response);
         }
         try {
+            long messageCreatedAt = record.timestamp(); // 프로듀서가 메시지를 생성한 시간 (CreateTime)
+
             switch (cmd) {
                 case CommunicationProtocol.REQUEST_WITHDRAW: // 출금
                     log.info("REQUEST_WITHDRAW : {}", record);
 
                     TransferWithdrawRequestDTO withdrawDTO = JsonUtil.fromJson(record.value(), TransferWithdrawRequestDTO.class);
 
-                    if (isExpired(withdrawDTO.getMessageCreatedAt())) {
+                    if (isExpired(messageCreatedAt)) {
                         log.warn("Expired withdraw message. Skipping process. transactionId: {}", withdrawDTO.getTransactionId());
                         return ApiResponse.ofJson(FailureStatusCode.REQUEST_TIMEOUT, null);
                     }
@@ -75,7 +77,7 @@ public class TransferListener {
 
                     TransferDepositRequestDTO depositDTO = JsonUtil.fromJson(record.value(), TransferDepositRequestDTO.class);
 
-                    if (isExpired(depositDTO.getMessageCreatedAt())) {
+                    if (isExpired(messageCreatedAt)) {
                         log.warn("Expired deposit message. Skipping process. transactionId: {}", depositDTO.getTransactionId());
                         return ApiResponse.ofJson(FailureStatusCode.REQUEST_TIMEOUT, null);
                     }
@@ -134,8 +136,7 @@ public class TransferListener {
      * @param messageCreatedAt 메세지가 생성된 타임스탬프
      * @return
      */
-    private boolean isExpired(Long messageCreatedAt) {
-        if (messageCreatedAt == null) return true; // null이면 무조건 실패 처리
+    private boolean isExpired(long messageCreatedAt) {
         long currentTime = System.currentTimeMillis();
         long diff = currentTime - messageCreatedAt;
         log.info("요청 발생 후 도착까지 걸린 시간: {}ms", diff);
