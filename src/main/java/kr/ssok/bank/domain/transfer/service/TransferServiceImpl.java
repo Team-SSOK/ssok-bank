@@ -40,6 +40,11 @@ public class TransferServiceImpl implements TransferService{
             throw new BaseException(FailureStatusCode.DUPLICATED_TRANSACTION_ID);
         }
 
+        // 유효하지 않은 금액 방지
+        if (dto.getTransferAmount() <= 0) {
+            throw new BaseException(FailureStatusCode.INVALID_TRANSFER_AMOUNT);
+        }
+
         // 1. 출금 계좌 락 걸고 조회
         // 1-1. 암호화: 출금 계좌번호
         log.info("dto.getWithdrawAccount() : " + dto.getWithdrawAccount());
@@ -83,6 +88,11 @@ public class TransferServiceImpl implements TransferService{
         // 0. 중복 transactionId 방지
         if (transferRepository.existsByTransactionIdAndTransferTypeCode(dto.getTransactionId(), TransferTypeCode.DEPOSIT)) {
             throw new BaseException(FailureStatusCode.DUPLICATED_TRANSACTION_ID);
+        }
+
+        // 유효하지 않은 금액 방지
+        if (dto.getTransferAmount() <= 0) {
+            throw new BaseException(FailureStatusCode.INVALID_TRANSFER_AMOUNT);
         }
 
         // 1. 선출금 내역 존재 확인
@@ -135,6 +145,11 @@ public class TransferServiceImpl implements TransferService{
         // 2. 이미 보상 처리된 경우, 예외 처리
         if (failedWithdrawal.getTransferStatusCode() == TransferStatusCode.COMPENSATED) {
             throw new BaseException(FailureStatusCode.TRANSFER_ALREADY_COMPENSATED);
+        }
+
+        // 유효하지 않은 금액 방지
+        if (failedWithdrawal.getTransferAmount() <= 0) {
+            throw new BaseException(FailureStatusCode.INVALID_TRANSFER_AMOUNT);
         }
 
         // 3. 출금 계좌 찾기
