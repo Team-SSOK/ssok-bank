@@ -21,6 +21,7 @@ public enum UserTypeCode {
         switch (input) {
             case 1: return INDIVIDUAL;
             case 2: return BUSINESS_OWNER;
+            case 3: return CORPORATION;
             default: return null;
         }
     }
