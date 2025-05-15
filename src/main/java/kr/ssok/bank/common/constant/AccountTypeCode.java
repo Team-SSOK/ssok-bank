@@ -17,4 +17,15 @@ public enum AccountTypeCode {
 
     private final int idx;
     private final String value;
+
+    public static AccountTypeCode valueOf(int input) {
+        switch (input) {
+            case 1: return AccountTypeCode.DEPOSIT;
+            case 2: return AccountTypeCode.SAVINGS;
+            case 3: return AccountTypeCode.SUBSCRIPTION;
+            default: return null;
+        }
+    }
+
+
 }
