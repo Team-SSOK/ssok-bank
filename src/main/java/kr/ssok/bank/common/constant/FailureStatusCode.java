@@ -21,6 +21,8 @@ public enum FailureStatusCode implements BaseCode {
     USER_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "USER4002", "사용자가 이미 존재합니다."),
     USER_CREATION_FAILED(HttpStatus.BAD_REQUEST, "USER4003", "사용자 생성에 실패했습니다."),
     USER_TYPE_ERROR(HttpStatus.BAD_REQUEST, "USER4004", "사용자 유형이 유효하지 않습니다."),
+    PHONE_ALREADY_USED_BY_DIFFERENT_NAME(HttpStatus.BAD_REQUEST,"USER4005", "해당 핸드폰 번호는 다른 이름으로 이미 사용 중입니다."),
+
 
     // 로그인 관련 에러
     INVALID_TOKEN(HttpStatus.BAD_REQUEST,"AUTH4001", "잘못된 토큰입니다."),

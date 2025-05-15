@@ -22,7 +22,12 @@ public class UserServiceImpl implements UserService{
     @Override
     public User createUser(UserRequestDTO userDto) throws BaseException {
 
-        this.userRepository.findByUsernameAndPhoneNumber(userDto.getUsername(),userDto.getPhoneNumber()).ifPresent(user -> {
+        this.userRepository.findByPhoneNumber(userDto.getPhoneNumber()).ifPresent(existingUser -> {
+            // 동일한 번호로 가입된 사용자가 있는데 이름이 다를 경우 예외 처리
+            if (!existingUser.getUsername().equals(userDto.getUsername())) {
+                throw new BaseException(FailureStatusCode.PHONE_ALREADY_USED_BY_DIFFERENT_NAME);
+            }
+            // 동일한 이름+번호 조합이면 기존 회원
             throw new BaseException(FailureStatusCode.USER_ALREADY_EXISTS);
         });
 
