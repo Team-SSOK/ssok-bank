@@ -57,7 +57,7 @@ public class AccountServiceImpl implements AccountService{
 
                 Account account = Account.builder()
                         .accountTypeCode(accountTypeCode)
-                        .accountNumber(aesUtil.encrypt(generateAccountNumber(accountTypeCode)))
+                        .accountNumber(aesUtil.encrypt(generateAccountNumber(accountTypeCode, bankCode)))
                         .balance(initialBalance)
                         .bankCode(bankCode)
                         .accountStatusCode(AccountStatusCode.ACTIVE)
@@ -150,9 +150,23 @@ public class AccountServiceImpl implements AccountService{
     }
 
     // 계좌번호 채번 메서드
-    private String generateAccountNumber(AccountTypeCode accountTypeCode) {
-        //SSOK 뱅크 계좌 Prefix 임의 지정 (LG CNS AM 종강일자)
+    private String generateAccountNumber(AccountTypeCode accountTypeCode, BankCode bankCode) {
         String bankPrefix = "626";
+
+        // 계좌 Prefix 임의 지정
+        switch (bankCode) {
+            case SSOK_BANK -> bankPrefix = "626";
+            case KAKAO_BANK -> bankPrefix = "090";
+            case KOOKMIN_BANK -> bankPrefix = "004";
+            case SHINHAN_BANK -> bankPrefix = "110";
+            case WOORI_BANK -> bankPrefix = "020";
+            case HANA_BANK -> bankPrefix = "081";
+            case NH_BANK -> bankPrefix = "011";
+            case IBK_BANK -> bankPrefix = "003";
+            case K_BANK -> bankPrefix = "089";
+            case TOSS_BANK -> bankPrefix = "100";
+            default -> bankPrefix = "626";
+        }
 
         //계좌 유형 고려 (예: 01 예금, 02 적금, 03 청약)
         String typeCode = String.format("%02d", accountTypeCode.getIdx());
