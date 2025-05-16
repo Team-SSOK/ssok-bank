@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
@@ -103,9 +104,15 @@ public class AccountController {
                     .orElseThrow(() -> new BaseException(FailureStatusCode.GOOD_READ_FAILED));
 
             // 2-2. 계좌 개설
-            Account account = accountService.createAccount(user, accountRequest.getAccountTypeCode(), good);
+//            Account account = accountService.createAccount(user, accountRequest.getAccountTypeCode(), good);
+            List<Account> accounts = accountService.createAccount(user, accountRequest.getAccountTypeCode(), good);
 
-            log.info("계좌 개설 성공: {}. Account Number: {}", user.getUsername(), account.getAccountNumber());
+            // 계좌번호 리스트 출력용 문자열 생성
+            String accountNumbers = accounts.stream()
+                    .map(a -> aesUtil.decrypt(a.getAccountNumber()))
+                    .collect(Collectors.joining(", "));
+
+            log.info("계좌 개설 성공: {}. Account Numbers: {}", user.getUsername(), accountNumbers);
 
             // 성공 응답
             return ApiResponse.of(SuccessStatusCode.ACCOUNT_CREATE_OK, null);

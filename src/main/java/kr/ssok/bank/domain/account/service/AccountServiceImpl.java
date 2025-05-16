@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -32,11 +33,12 @@ public class AccountServiceImpl implements AccountService{
     private final AESUtil aesUtil;
 
     // 계좌 생성 메서드
-    public Account createAccount(User user, AccountTypeCode accountTypeCode, Good good) throws BaseException {
+    public List<Account> createAccount(User user, AccountTypeCode accountTypeCode, Good good) throws BaseException {
         try {
-            log.info("사용자 생성 시작: {}", user.getUsername());
+            log.info("사용자 계좌 생성 시작: {}", user.getUsername());
 
-            // 계좌 생성 시 빌더 패턴을 사용
+            /* 단일 계좌 생성 로직
+            *  // 계좌 생성 시 빌더 패턴을 사용
             Account account = Account.builder()
                     .accountTypeCode(accountTypeCode)
                     .accountNumber(aesUtil.encrypt(generateAccountNumber(accountTypeCode)))
@@ -47,16 +49,46 @@ public class AccountServiceImpl implements AccountService{
                     .user(user)
                     .good(good)
                     .build();
+                    * */
+            List<Account> accounts = new ArrayList<>();
 
-            log.info("사용자 생성 완료: {}", user.getUsername());
+            for (BankCode bankCode : List.of(BankCode.SSOK_BANK, BankCode.KAKAO_BANK, BankCode.TOSS_BANK)) {
+                long initialBalance = getInitialBalanceByBank(bankCode);
+
+                Account account = Account.builder()
+                        .accountTypeCode(accountTypeCode)
+                        .accountNumber(aesUtil.encrypt(generateAccountNumber(accountTypeCode)))
+                        .balance(initialBalance)
+                        .bankCode(bankCode)
+                        .accountStatusCode(AccountStatusCode.ACTIVE)
+                        .withdrawLimit(300000L)
+                        .user(user)
+                        .good(good)
+                        .build();
+
+                accounts.add(accountRepository.save(account));
+                log.info("{} 계좌 생성 완료 (잔액: {}): {}", bankCode.name(), initialBalance, user.getUsername());
+            }
+
+//            log.info("사용자 생성 완료: {}", user.getUsername());
 
             // 계좌 저장
-            return accountRepository.save(account);
+//            return accountRepository.save(account);
+            return accounts;
         } catch (Exception e) {
             log.error("계좌 생성 중 오류 발생: {}", user.getUsername(), e);
             throw new BaseException(FailureStatusCode.ACCOUNT_CREATE_FAILED);
         }
+    }
 
+    // 은행별 초기 잔액 설정 메서드
+    private long getInitialBalanceByBank(BankCode bankCode) {
+        return switch (bankCode) {
+            case SSOK_BANK -> 5753500L;
+            case KAKAO_BANK -> 654500L;
+            case TOSS_BANK -> 1758300L;
+            default -> 0L;
+        };
     }
 
     @Override
