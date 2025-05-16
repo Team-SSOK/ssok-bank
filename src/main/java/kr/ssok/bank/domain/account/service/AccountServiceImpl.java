@@ -70,6 +70,10 @@ public class AccountServiceImpl implements AccountService{
                 log.info("{} 계좌 생성 완료 (잔액: {}): {}", bankCode.name(), initialBalance, user.getUsername());
             }
 
+//            log.info("사용자 생성 완료: {}", user.getUsername());
+
+            // 계좌 저장
+//            return accountRepository.save(account);
             return accounts;
         } catch (Exception e) {
             log.error("계좌 생성 중 오류 발생: {}", user.getUsername(), e);

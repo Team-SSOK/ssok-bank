@@ -10,6 +10,7 @@ import kr.ssok.bank.domain.user.entity.User;
 import java.util.List;
 
 public interface AccountService {
+//    public Account createAccount(User user, AccountTypeCode accountTypeCode, Good good) throws BaseException;
     public List<Account> createAccount(User user, AccountTypeCode accountTypeCode, Good good) throws BaseException;
     public Account getAccountByAccountNumber(String accountNumber);
     public List<AccountResponseDTO> getAccountsByUsernameAndPhoneNumber(String username, String phoneNumber);

@@ -104,6 +104,7 @@ public class AccountController {
                     .orElseThrow(() -> new BaseException(FailureStatusCode.GOOD_READ_FAILED));
 
             // 2-2. 계좌 개설
+//            Account account = accountService.createAccount(user, accountRequest.getAccountTypeCode(), good);
             List<Account> accounts = accountService.createAccount(user, accountRequest.getAccountTypeCode(), good);
 
             // 계좌번호 리스트 출력용 문자열 생성
