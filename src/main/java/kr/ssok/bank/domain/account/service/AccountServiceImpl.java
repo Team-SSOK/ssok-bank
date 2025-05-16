@@ -27,7 +27,7 @@ public class AccountServiceImpl implements AccountService{
             Account account = Account.builder()
                     .accountTypeCode(accountTypeCode)
                     .accountNumber(generateAccountNumber(accountTypeCode))
-                    .balance(4967500L) // 초기 잔액 임의 셋팅
+                    .balance(4967500L) // 초기 잔액 0
                     .bankCode(BankCode.SSOK_BANK) // 은행 코드 처리
                     .accountStatusCode(AccountStatusCode.ACTIVE) // 기본 활성
                     .withdrawLimit(300000L) // 출금 한도 30만원

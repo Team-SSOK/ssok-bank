@@ -5,21 +5,27 @@ import kr.ssok.bank.common.constant.AccountStatusCode;
 import kr.ssok.bank.common.constant.AccountTypeCode;
 import kr.ssok.bank.common.constant.BankCode;
 import kr.ssok.bank.common.entity.TimeStamp;
+import kr.ssok.bank.domain.good.entity.Good;
+import kr.ssok.bank.domain.transfer.entity.TransferHistory;
 import kr.ssok.bank.domain.user.entity.User;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Getter
+@Setter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Account extends TimeStamp {
 
     @Id
+    @Column(name = "account_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long accountId;
 
@@ -36,6 +42,14 @@ public class Account extends TimeStamp {
     @Column(name = "balance" , nullable = false)
     private Long balance;
 
+    public void withdraw(Long amount) {
+        balance -= amount;
+    }
+
+    public void deposit(Long amount) {
+        balance += amount;
+    }
+
     //은행 코드
     @Enumerated(EnumType.STRING)
     @Column(name = "bank_code", nullable = false)
@@ -46,6 +60,10 @@ public class Account extends TimeStamp {
     @Column(name = "account_status_code", nullable = false)
     private AccountStatusCode accountStatusCode;
 
+    public boolean isDormant() {
+        return this.accountStatusCode == AccountStatusCode.DORMANT;
+    }
+
     //출금 한도
     @Column(name = "withdraw_limit" , nullable = false)
     private Long withdrawLimit;
@@ -54,8 +72,24 @@ public class Account extends TimeStamp {
         return date.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
     }
 
+    // 마지막 이자 지급 일시
+    @Column(name = "last_interest_paid_at")
+    private LocalDateTime lastInterestPaidAt;
+
+    // User
     @Setter
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
+
+    // TransferHistory
+    @Setter
+    @OneToMany(mappedBy = "account", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<TransferHistory> transferHistories = new ArrayList<>();
+
+    // Good (상품)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "good_id", nullable = false)
+    private Good good;
+
 }

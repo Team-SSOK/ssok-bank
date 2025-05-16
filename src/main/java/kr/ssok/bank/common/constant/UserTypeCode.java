@@ -17,4 +17,13 @@ public enum UserTypeCode {
     private final int idx;
     private final String value;
 
+    public static UserTypeCode valueOf(int input) {
+        switch (input) {
+            case 1: return INDIVIDUAL;
+            case 2: return BUSINESS_OWNER;
+            case 3: return CORPORATION;
+            default: return null;
+        }
+    }
+
 }
