@@ -26,7 +26,7 @@ public class User extends TimeStamp {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId;
 
-    @Column(name = "username", unique = true , nullable = false)
+    @Column(name = "username", nullable = false)
     private String username;
 
     @Column(name = "phone_number", length = 64 , nullable = false)
