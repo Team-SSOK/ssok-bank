@@ -68,6 +68,9 @@ dependencies {
     implementation 'org.springframework.kafka:spring-kafka'
     implementation 'com.fasterxml.jackson.core:jackson-databind'
     testImplementation 'org.springframework.kafka:spring-kafka-test'
+
+    // fluentbit에 포맷 정의
+    implementation "net.logstash.logback:logstash-logback-encoder:8.1"
 }
 
 tasks.named('test') {
