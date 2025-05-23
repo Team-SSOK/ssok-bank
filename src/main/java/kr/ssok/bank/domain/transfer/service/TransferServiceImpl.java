@@ -84,7 +84,7 @@ public class TransferServiceImpl implements TransferService{
 
     // 입금 이체
     @Transactional
-    public void deposit(TransferDepositRequestDTO dto) {
+    public void deposit(TransferDepositRequestDTO dto) throws BaseException {
         // 0. 중복 transactionId 방지
         if (transferRepository.existsByTransactionIdAndTransferTypeCode(dto.getTransactionId(), TransferTypeCode.DEPOSIT)) {
             throw new BaseException(FailureStatusCode.DUPLICATED_TRANSACTION_ID);
@@ -136,7 +136,7 @@ public class TransferServiceImpl implements TransferService{
 
     // 보상 처리
     @Transactional
-    public void compensate(CompensateRequestDTO compensateRequestDTO) {
+    public void compensate(CompensateRequestDTO compensateRequestDTO) throws BaseException {
         // 1. 실패한 출금 내역을 찾는다.
         TransferHistory failedWithdrawal
                 = transferRepository.findByTransactionIdAndTransferTypeCode(compensateRequestDTO.getTransactionId(), TransferTypeCode.WITHDRAW)

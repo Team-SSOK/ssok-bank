@@ -59,7 +59,7 @@ public class TransferListener {
 
             switch (cmd) {
                 case CommunicationProtocol.REQUEST_WITHDRAW: // 출금
-                    log.info("REQUEST_WITHDRAW_VALUE : {}", record.value());
+                    log.info("REQUEST_WITHDRAW: {}", record);
 
                     TransferWithdrawRequestDTO withdrawDTO = JsonUtil.fromJson(record.value(), TransferWithdrawRequestDTO.class);
 

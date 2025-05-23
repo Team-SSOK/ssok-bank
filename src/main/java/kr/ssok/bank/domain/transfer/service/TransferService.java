@@ -7,6 +7,6 @@ import kr.ssok.bank.domain.transfer.dto.TransferWithdrawRequestDTO;
 
 public interface TransferService {
     public void withdraw(TransferWithdrawRequestDTO transferWithdrawRequestDTO) throws BaseException;
-    public void deposit(TransferDepositRequestDTO transferDepositRequestDTO);
-    public void compensate(CompensateRequestDTO compensateRequestDTO);
+    public void deposit(TransferDepositRequestDTO transferDepositRequestDTO) throws BaseException;
+    public void compensate(CompensateRequestDTO compensateRequestDTO) throws BaseException;
 }
