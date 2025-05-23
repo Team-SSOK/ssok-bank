@@ -34,7 +34,7 @@ public class TransferServiceImpl implements TransferService{
 
     // 출금 이체
     @Transactional
-    public void withdraw(TransferWithdrawRequestDTO dto) {
+    public void withdraw(TransferWithdrawRequestDTO dto) throws BaseException {
         // 0. 중복 transactionId 방지
         if (transferRepository.existsByTransactionIdAndTransferTypeCode(dto.getTransactionId(), TransferTypeCode.WITHDRAW)) {
             throw new BaseException(FailureStatusCode.DUPLICATED_TRANSACTION_ID);

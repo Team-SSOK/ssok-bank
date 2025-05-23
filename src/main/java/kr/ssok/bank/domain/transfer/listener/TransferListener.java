@@ -68,6 +68,7 @@ public class TransferListener {
                         return ApiResponse.ofJson(FailureStatusCode.REQUEST_TIMEOUT, null);
                     }
 
+                    log.info("Transfer 서비스 withdraw 호출");
                     transferService.withdraw(withdrawDTO);
 
                     return ApiResponse.ofJson(SuccessStatusCode.TRANSFER_WITHDRAW_OK, null);
