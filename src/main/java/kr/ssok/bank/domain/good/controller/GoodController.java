@@ -39,30 +39,29 @@ public class GoodController {
     @GetMapping("/good")
     public ApiResponse<List<GoodResponseDTO>> getUserAccounts() {
 
-        log.info("[GET] /good - 상품 조회 요청");
-
+        log.info("[상품 조회] 컨트롤러 진입");
         try {
 
             List<GoodResponseDTO> response = goodService.getAllGoods();
 
             // 1-1. 조회 결과 상품이 없는 경우
             if (response.isEmpty()) {
-                log.warn("상품 조회 성공 (상품 없음)");
+                log.warn("[상품 조회] 성공: 상품 없음");
                 return ApiResponse.of(SuccessStatusCode.GOOD_READ_OK , null); // 또는 notFound()도 가능
             }
 
             // 성공 응답
-            log.info("상품 조회 성공: 상품 수 = {}", response.size());
+            log.info("[상품 조회] 성공: 상품 수 = {}", response.size());
             return ApiResponse.of(SuccessStatusCode.GOOD_READ_OK, response);
 
         } catch (BaseException e) {
-            log.error("상품 조회 실패: 에러 = {}", e.getMessage());
+            log.error("[상품 조회] 실패: 에러 = {}", e.getMessage());
 
             // 실패 응답
             return ApiResponse.of(FailureStatusCode.GOOD_READ_FAILED, null);
 
         } catch (Exception e) {
-            log.error("상품 조회 중 알 수 없는 오류 발생: 에러 = {}", e.getMessage(), e);
+            log.error("[상품 조회] 알 수 없는 오류 발생: 에러 = {}", e.getMessage(), e);
 
             //서버 오류 응답
             return ApiResponse.of(FailureStatusCode._INTERNAL_SERVER_ERROR, null);
