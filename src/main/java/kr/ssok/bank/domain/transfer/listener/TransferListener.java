@@ -59,7 +59,7 @@ public class TransferListener {
 
             switch (cmd) {
                 case CommunicationProtocol.REQUEST_WITHDRAW: // 출금
-                    log.info("REQUEST_WITHDRAW : {}", record);
+                    log.info("REQUEST_WITHDRAW_VALUE : {}", record.value());
 
                     TransferWithdrawRequestDTO withdrawDTO = JsonUtil.fromJson(record.value(), TransferWithdrawRequestDTO.class);
 
@@ -95,8 +95,10 @@ public class TransferListener {
                     return ApiResponse.ofJson(SuccessStatusCode.TRANSFER_COMPENSATE_OK, null);
             }
         } catch (BaseException e) {
+            log.error(e.getMessage(), e);
             return ApiResponse.ofJson(e.getStatus(), null);
         } catch (Exception e) {
+            log.error(e.getMessage(), e);
             return ApiResponse.ofJson(FailureStatusCode._INTERNAL_SERVER_ERROR, null);
         }
         return ApiResponse.ofJson(FailureStatusCode._INTERNAL_SERVER_ERROR, null);

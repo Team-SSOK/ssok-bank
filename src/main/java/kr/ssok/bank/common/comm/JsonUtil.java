@@ -19,7 +19,7 @@ public class JsonUtil {
         OBJECT_MAPPER.registerModule(new JavaTimeModule());
     }
 
-    public static String toJson(Object object) {
+    public static String toJson(Object object){
         try {
             return OBJECT_MAPPER.writeValueAsString(object);
         } catch (Exception e) {
@@ -27,7 +27,7 @@ public class JsonUtil {
         }
     }
 
-    public static <T> T fromJson(String json, Class<T> valueType) {
+    public static <T> T fromJson(String json, Class<T> valueType) throws Exception {
         try {
             return OBJECT_MAPPER.readValue(json, valueType);
         } catch (Exception e) {
