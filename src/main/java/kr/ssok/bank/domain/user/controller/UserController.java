@@ -40,6 +40,8 @@ public class UserController {
     public ApiResponse<UserRequestDTO> createUser(@RequestBody UserRequestDTO userRequestDto, HttpServletRequest request) {
         try
         {
+            log.info("[사용자 생성] 컨트롤러 진입: 사용자 이름 = {}", userRequestDto.getUsername());
+            
             User user = this.userService.createUser(userRequestDto);
 //          this.accountService.createAccount(user, AccountTypeCode.DEPOSIT);
             return ApiResponse.of(SuccessStatusCode.USER_CREATION_OK,null);

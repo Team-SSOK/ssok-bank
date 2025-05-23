@@ -21,6 +21,7 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public User createUser(UserRequestDTO userDto) throws BaseException {
+        log.info("[사용자 생성] 서비스 진입: 사용자 이름 = {}", userDto.getUsername());
 
         this.userRepository.findByPhoneNumber(userDto.getPhoneNumber()).ifPresent(existingUser -> {
             // 동일한 번호로 가입된 사용자가 있는데 이름이 다를 경우 예외 처리

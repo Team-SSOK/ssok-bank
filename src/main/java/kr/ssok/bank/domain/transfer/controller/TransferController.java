@@ -28,21 +28,21 @@ public class TransferController {
     @PostMapping("/withdraw")
     public ApiResponse<String> createWithdraw(@RequestBody TransferWithdrawRequestDTO transferWithdrawRequestDTO) {
         try {
-            log.info("[WITHDRAW] 요청 수신: {}", transferWithdrawRequestDTO);
+            log.info("[출금 이체] 컨트롤러 진입: 요청 수신 = {}", transferWithdrawRequestDTO);
             transferService.withdraw(transferWithdrawRequestDTO);
-            log.info("[WITHDRAW] 출금 완료 - 계좌: {}, 금액: {}",
+            log.info("[출금 이체] 성공: 계좌 = {}, 금액 = {}",
                     transferWithdrawRequestDTO.getWithdrawAccount(),
                     transferWithdrawRequestDTO.getTransferAmount()
             );
             return ApiResponse.of(SuccessStatusCode.TRANSFER_WITHDRAW_OK, null);
         } catch (BaseException e) {
-            log.warn("[WITHDRAW] 출금 실패 - 계좌: {}, 사유: {}",
+            log.warn("[출금 이체] 실패: 계좌 = {}, 사유 = {}",
                     transferWithdrawRequestDTO.getWithdrawAccount(),
                     e.getStatus().getMessage()
             );
             throw e;
         } catch (Exception e) {
-            log.error("[WITHDRAW] 서버 오류 - {}", e.getMessage(), e);
+            log.error("[출금 이체] 실패: {}", e.getMessage(), e);
             throw new BaseException(FailureStatusCode._INTERNAL_SERVER_ERROR);
         }
     }
@@ -52,21 +52,21 @@ public class TransferController {
     @PostMapping("/deposit")
     public ApiResponse<String> createDeposit(@RequestBody TransferDepositRequestDTO transferDepositRequestDTO) {
         try {
-            log.info("[DEPOSIT] 요청 수신: {}", transferDepositRequestDTO);
+            log.info("[입금 이체] 컨트롤러 진입: 요청 수신 = {}", transferDepositRequestDTO);
             transferService.deposit(transferDepositRequestDTO);
-            log.info("[DEPOSIT] 입금 완료 - 계좌: {}, 금액: {}",
+            log.info("[입금 이체] 성공: 계좌 = {}, 금액 = {}",
                     transferDepositRequestDTO.getDepositAccount(),
                     transferDepositRequestDTO.getTransferAmount()
             );
             return ApiResponse.of(SuccessStatusCode.TRANSFER_DEPOSIT_OK, null);
         } catch (BaseException e) {
-            log.warn("[DEPOSIT] 입금 실패 - 계좌: {}, 사유: {}",
+            log.warn("[입금 이체] 실패: 계좌 = {}, 사유 = {}",
                     transferDepositRequestDTO.getDepositAccount(),
                     e.getStatus().getMessage()
             );
             throw e;
         } catch (Exception e) {
-            log.error("[DEPOSIT] 서버 오류 - {}", e.getMessage(), e);
+            log.error("[입금 이체] 오류: {}", e.getMessage(), e);
             throw new BaseException(FailureStatusCode._INTERNAL_SERVER_ERROR);
         }
     }

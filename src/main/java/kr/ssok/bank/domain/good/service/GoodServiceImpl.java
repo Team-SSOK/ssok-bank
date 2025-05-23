@@ -31,6 +31,8 @@ public class GoodServiceImpl implements GoodService {
 
     @Override
     public List<GoodResponseDTO> getAllGoods() {
+        log.info("[상품 조회] 서비스 진입");
+
         return goodRepository.findAll().stream()
                 .map(GoodResponseDTO::from)
                 .collect(Collectors.toList());

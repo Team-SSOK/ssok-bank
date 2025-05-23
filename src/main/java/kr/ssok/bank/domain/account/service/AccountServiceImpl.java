@@ -35,7 +35,7 @@ public class AccountServiceImpl implements AccountService{
     // 계좌 생성 메서드
     public List<Account> createAccount(User user, AccountTypeCode accountTypeCode, Good good) throws BaseException {
         try {
-            log.info("사용자 계좌 생성 시작: {}", user.getUsername());
+            log.info("[계좌 개설] 서비스 진입: {}", user.getUsername());
 
             /* 단일 계좌 생성 로직
             *  // 계좌 생성 시 빌더 패턴을 사용
@@ -67,7 +67,7 @@ public class AccountServiceImpl implements AccountService{
                         .build();
 
                 accounts.add(accountRepository.save(account));
-                log.info("{} 계좌 생성 완료 (잔액: {}): {}", bankCode.name(), initialBalance, user.getUsername());
+                log.info("[계좌 개설] 계좌 개설 완료: (은행: {}, 잔액: {}, 사용자 이름: {})", bankCode.name(), initialBalance, user.getUsername());
             }
 
 //            log.info("사용자 생성 완료: {}", user.getUsername());
@@ -76,7 +76,7 @@ public class AccountServiceImpl implements AccountService{
 //            return accountRepository.save(account);
             return accounts;
         } catch (Exception e) {
-            log.error("계좌 생성 중 오류 발생: {}", user.getUsername(), e);
+            log.error("[계좌 개설] 서비스 처리 실패: 사용자 이름={}", user.getUsername(), e);
             throw new BaseException(FailureStatusCode.ACCOUNT_CREATE_FAILED);
         }
     }
@@ -93,6 +93,7 @@ public class AccountServiceImpl implements AccountService{
 
     @Override
     public Account getAccountByAccountNumber(String accountNumber) throws BaseException {
+        log.info("[계좌 조회] 서비스 진입: 계좌번호 = {}", accountNumber);
         String encryptedAccountNumber = aesUtil.encrypt(accountNumber);
 
         return this.accountRepository.findAccountByAccountNumber(encryptedAccountNumber).orElseThrow(()->
@@ -104,12 +105,12 @@ public class AccountServiceImpl implements AccountService{
     @Override
     public List<AccountResponseDTO> getAccountsByUsernameAndPhoneNumber(String username, String phoneNumber) {
 
-        log.info("계좌 조회 요청: username = {} , phoneNumber = {}", username, phoneNumber);
+        log.info("[계좌 조회] 서비스 진입: 사용자 이름 = {} , 핸드폰 번호 = {}", username, phoneNumber);
 
         // 사용자 조회
         User user = userRepository.findByUsernameAndPhoneNumber(username, phoneNumber)
                 .orElseThrow(() -> {
-                    log.warn("사용자 정보 없음: username = {}, phoneNumber = {}", username, phoneNumber);
+                    log.warn("[계좌 조회] 사용자 정보 없음: 사용자 이름 = {}, 핸드폰 번호 = {}", username, phoneNumber);
                     return new BaseException(FailureStatusCode.USER_NOT_FOUND);
                 });
 
@@ -133,18 +134,22 @@ public class AccountServiceImpl implements AccountService{
                 })
                 .collect(Collectors.toList());
 
-        log.info("계좌 조회 성공: username = {}, 계좌 수 = {}", username, result.size());
+        log.info("[계좌 조회] 서비스 처리 성공: 사용자 이름 = {}, 계좌 수 = {}", username, result.size());
 
         return result;
     }
 
     // 휴면 계좌 여부 확인 메서드
     @Override
-    public boolean isAccountDormant(String accountNumber) {
+    public boolean isAccountDormant(String accountNumber) throws BaseException{
+        log.info("[휴면 계좌 여부 검사] 서비스 진입: 계좌번호 = {}", accountNumber);
         String encryptedAccountNumber = aesUtil.encrypt(accountNumber);
 
         Account account = accountRepository.findAccountByAccountNumber(encryptedAccountNumber)
                 .orElseThrow(() -> new BaseException(FailureStatusCode.ACCOUNT_NOT_FOUND));
+
+        log.info("[휴면 계좌 여부 검사] 서비스 처리 성공: 계좌번호 = {}, 휴면여부 = {}"
+                , accountNumber, account.getAccountStatusCode());
 
         return account.isDormant();
     }
