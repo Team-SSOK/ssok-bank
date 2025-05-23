@@ -6,6 +6,7 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum BankCode {
+    UNKNOWN_BANK(0, "unknownbank"),
     SSOK_BANK(1, "ssokbank"),
     KAKAO_BANK(2, "kakaobank"),
     KOOKMIN_BANK(3, "kbbank"),
