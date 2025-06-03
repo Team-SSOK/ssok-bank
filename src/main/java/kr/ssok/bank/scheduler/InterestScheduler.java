@@ -58,7 +58,6 @@ public class InterestScheduler {
                     continue;
                 }
 
-                // 이자 계산
                 // 이자 계산 (연이율 → 일이율 적용)
                 BigDecimal annualRate = BigDecimal.valueOf(good.getInterestRate());
                 BigDecimal dailyRate = annualRate.divide(BigDecimal.valueOf(100 * 365), 10, BigDecimal.ROUND_HALF_UP);
@@ -69,6 +68,7 @@ public class InterestScheduler {
                         .divide(BigDecimal.valueOf(100), 2, BigDecimal.ROUND_HALF_UP);
                         */
 
+                // 일이율
                 BigDecimal interestAmount = new BigDecimal(account.getBalance())
                         .multiply(dailyRate)
                         .setScale(0, BigDecimal.ROUND_DOWN); // 정수 처리
