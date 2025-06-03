@@ -1,9 +1,6 @@
 package kr.ssok.bank.scheduler;
 
-import kr.ssok.bank.common.constant.AccountStatusCode;
-import kr.ssok.bank.common.constant.CurrencyCode;
-import kr.ssok.bank.common.constant.TransferStatusCode;
-import kr.ssok.bank.common.constant.TransferTypeCode;
+import kr.ssok.bank.common.constant.*;
 import kr.ssok.bank.common.util.AESUtil;
 import kr.ssok.bank.domain.account.entity.Account;
 import kr.ssok.bank.domain.account.repository.AccountRepository;
@@ -35,7 +32,8 @@ public class InterestScheduler {
     public void applyInterestToAccounts() {
         log.info(">>> 이자 지급 스케줄러 실행 시작");
 
-        List<Account> accounts = accountRepository.findByAccountStatusCodeAndBalanceGreaterThan(AccountStatusCode.ACTIVE, 0L);
+        List<Account> accounts = accountRepository
+                .findByAccountStatusCodeAndBalanceGreaterThanAndBankCode(AccountStatusCode.ACTIVE, 0L, BankCode.SSOK_BANK);
 
         for (Account account : accounts) {
             try {
