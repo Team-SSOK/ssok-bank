@@ -59,9 +59,24 @@ public class InterestScheduler {
                 }
 
                 // 이자 계산
+                // 이자 계산 (연이율 → 일이율 적용)
+                BigDecimal annualRate = BigDecimal.valueOf(good.getInterestRate());
+                BigDecimal dailyRate = annualRate.divide(BigDecimal.valueOf(100 * 365), 10, BigDecimal.ROUND_HALF_UP);
+
+                /* 연이율 (기존 코드)
                 BigDecimal interestAmount = new BigDecimal(account.getBalance())
-                        .multiply(BigDecimal.valueOf(good.getInterestRate()))
+                        .multiply(annualRate)
                         .divide(BigDecimal.valueOf(100), 2, BigDecimal.ROUND_HALF_UP);
+                        */
+
+                BigDecimal interestAmount = new BigDecimal(account.getBalance())
+                        .multiply(dailyRate)
+                        .setScale(0, BigDecimal.ROUND_DOWN); // 정수 처리
+
+                if (interestAmount.compareTo(BigDecimal.ZERO) == 0) {
+                    log.info(">>> {} 계좌는 이자 금액이 0으로 지급되지 않습니다.", account.getAccountNumber());
+                    continue;
+                }
 
                 // 잔액 갱신
                 BigDecimal currentBalance = new BigDecimal(account.getBalance());
