@@ -30,7 +30,7 @@ public class InterestScheduler {
     @Scheduled(cron = "0 0 1 * * *")
     @Transactional
     public void applyInterestToAccounts() {
-        log.info(">>> 이자 지급 스케줄러 실행 시작");
+        log.info("[이자 지급] 스케줄러 실행 시작...");
 
         List<Account> accounts = accountRepository
                 .findByAccountStatusCodeAndBalanceGreaterThanAndBankCode(AccountStatusCode.ACTIVE, 0L, BankCode.SSOK_BANK);
@@ -40,7 +40,7 @@ public class InterestScheduler {
                 Good good = account.getGood();
 
                 if (good == null || good.getInterestRate() == null || good.getInterestCycle() == null) {
-                    log.warn(">>> {} 계좌의 상품 정보가 잘못되었거나 설정되지 않았습니다.", account.getAccountNumber());
+                    log.warn("[이자 지급] {} 계좌의 상품 정보가 잘못되었거나 설정되지 않았습니다.", account.getAccountNumber());
                     continue;
                 }
 
@@ -52,7 +52,7 @@ public class InterestScheduler {
 
                 long daysSinceLastInterest = java.time.Duration.between(lastInterestPaidAt, now).toDays();
                 if (daysSinceLastInterest < good.getInterestCycle()) {
-                    log.info(">>> {} 계좌는 이자 지급 주기가 지나지 않았습니다.", account.getAccountNumber());
+                    log.info("[이자 지급] {} 계좌는 이자 지급 주기가 지나지 않았습니다.", account.getAccountNumber());
                     continue;
                 }
 
@@ -72,7 +72,7 @@ public class InterestScheduler {
                         .setScale(0, BigDecimal.ROUND_DOWN); // 정수 처리
 
                 if (interestAmount.compareTo(BigDecimal.ZERO) == 0) {
-                    log.info(">>> {} 계좌는 이자 금액이 0으로 지급되지 않습니다.", account.getAccountNumber());
+                    log.info("[이자 지급] {} 계좌는 이자 금액이 0으로 지급되지 않습니다.", account.getAccountNumber());
                     continue;
                 }
 
@@ -101,13 +101,13 @@ public class InterestScheduler {
                 transferHistoryRepository.save(history);
 
                 String maskedAccountNumber = account.getAccountNumber().replaceAll("(\\d{2})\\d+(\\d{2})", "$1****$2");
-                log.info(">>> {} 계좌에 이자 지급 완료: + {}", maskedAccountNumber, interestAmount);
+                log.info("[이자 지급] {} 계좌에 이자 지급 완료: + {}", maskedAccountNumber, interestAmount);
 
             } catch (Exception e) {
-                log.error(">>> {} 계좌 이자 지급 중 오류 발생: {}", account.getAccountNumber(), e.getMessage(), e);
+                log.error("[이자 지급] {} 계좌 이자 지급 중 오류 발생: {}", account.getAccountNumber(), e.getMessage(), e);
             }
         }
 
-        log.info(">>> 이자 지급 스케줄러 실행 종료");
+        log.info("[이자 지급] 스케줄러 실행 종료");
     }
 }
