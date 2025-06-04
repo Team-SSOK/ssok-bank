@@ -101,10 +101,10 @@ public class InterestScheduler {
                 transferHistoryRepository.save(history);
 
                 String maskedAccountNumber = account.getAccountNumber().replaceAll("(\\d{2})\\d+(\\d{2})", "$1****$2");
-                log.info("[이자 지급] {} 계좌에 이자 지급 완료: + {}", maskedAccountNumber, interestAmount);
+                log.info("[이자 지급] 지급 완료 : 계좌 = {}, 금액 = {}", maskedAccountNumber, interestAmount);
 
             } catch (Exception e) {
-                log.error("[이자 지급] {} 계좌 이자 지급 중 오류 발생: {}", account.getAccountNumber(), e.getMessage(), e);
+                log.error("[이자 지급] 처리 중 오류 발생 : {}, {}", account.getAccountNumber(), e.getMessage(), e);
             }
         }
 
