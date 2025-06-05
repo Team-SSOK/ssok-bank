@@ -2,6 +2,7 @@ package kr.ssok.bank.common.config;
 
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
+import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.beans.factory.annotation.Value;
@@ -9,9 +10,13 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.core.*;
+import org.springframework.kafka.listener.CommonErrorHandler;
 import org.springframework.kafka.listener.ContainerProperties;
+import org.springframework.kafka.listener.DeadLetterPublishingRecoverer;
+import org.springframework.kafka.listener.DefaultErrorHandler;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.kafka.support.serializer.JsonSerializer;
+import org.springframework.util.backoff.FixedBackOff;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -78,6 +83,8 @@ public class KafkaConfig {
         factory.setReplyTemplate(replyTemplate());
         // 응답 헤더 설정을 활성화하여 @SendTo가 작동하도록 함
         factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.RECORD);
+        // DLQ 설정
+        factory.setCommonErrorHandler(errorHandler());
         return factory;
     }
 
@@ -92,6 +99,21 @@ public class KafkaConfig {
                 new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(requestConsumerFactory());
         return factory;
+    }
+
+    @Bean
+    public CommonErrorHandler errorHandler() {
+        // 재시도 정책 설정
+        FixedBackOff fixedBackOff = new FixedBackOff(1000L, 3L); // 1초 간격으로 3번 재시도
+        // DLQ 설정
+        DeadLetterPublishingRecoverer recoverer = new DeadLetterPublishingRecoverer(
+                replyTemplate(),
+                (consumerRecord, exception) -> {
+                    String originalTopic = consumerRecord.topic(); // DLQ 토픽 생성
+                    return new TopicPartition(originalTopic + ".dlt", consumerRecord.partition());
+                }
+        );
+        return new DefaultErrorHandler(recoverer, fixedBackOff);
     }
 
 }
