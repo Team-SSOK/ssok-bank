@@ -13,18 +13,27 @@ import kr.ssok.bank.domain.transfer.service.TransferService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.apache.kafka.clients.producer.ProducerRecord;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Component;
+
+import java.nio.charset.StandardCharsets;
+import java.util.concurrent.CompletableFuture;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class TransferListener {
 
+    @Value("${spring.kafka.request-topic-dlt}")
+    private String deadLetterTopic;
     private final TransferService transferService;
+    private final KafkaTemplate<String, Object> replyTemplate;
 
     /**
      * 프로미스 요청에 대한 카프카 리스너
@@ -88,10 +97,17 @@ public class TransferListener {
 
                 case CommunicationProtocol.REQUEST_COMPENSATE: // 보상
                     log.info("REQUEST_COMPENSATE : {}", record);
-
                     CompensateRequestDTO compensateDTO = JsonUtil.fromJson(record.value(), CompensateRequestDTO.class);
-                    transferService.compensate(compensateDTO);
-
+                    try
+                    {
+                        transferService.compensate(compensateDTO);
+                    }
+                    catch (Exception e)
+                    {
+                        log.error("COMPENSATE ERROR : Database Failed => Send Message to DLQ(DeadLetterQueue)");
+                        this.sendToDeadLetterQueue(record, cmd, e);
+                        return ApiResponse.ofJson(FailureStatusCode.TRANSFER_COMPENSATE_FAILED, null);
+                    }
                     return ApiResponse.ofJson(SuccessStatusCode.TRANSFER_COMPENSATE_OK, null);
             }
         } catch (BaseException e) {
@@ -102,8 +118,27 @@ public class TransferListener {
             return ApiResponse.ofJson(FailureStatusCode._INTERNAL_SERVER_ERROR, null);
         }
         return ApiResponse.ofJson(FailureStatusCode._INTERNAL_SERVER_ERROR, null);
-
     }
+
+    @KafkaListener(topics = "${spring.kafka.request-topic-dlt}", groupId = "request-server-group")
+    public void handleFailures(ConsumerRecord<String, String> record,
+                               @Header(value = "CMD", required = false) String cmd) {
+        log.info("DLQ REQUEST_COMPENSATE START : {}", record.value());
+        try
+        {
+            CompensateRequestDTO compensateDTO = JsonUtil.fromJson(record.value(), CompensateRequestDTO.class);
+            transferService.compensate(compensateDTO);
+            log.info("DLQ REQUEST_COMPENSATE COMPLETE - TRANSACTION ID: {}",compensateDTO.getTransactionId());
+        }
+        catch (Exception e)
+        {
+            log.error("DLQ processing failed - Manual intervention required");
+            log.error("=====< FINAL COMPENSATE ERROR >=====");
+            log.error("> ERROR : {}",record.value(), e);
+            log.error("====================================");
+        }
+    }
+
 
     /**
      * 단방향 메세지 요청에 대한 카프카 리스너
@@ -144,4 +179,23 @@ public class TransferListener {
         log.info("요청 발생 후 도착까지 걸린 시간: {}ms", diff);
         return diff > 10000L; // 10초
     }
+
+    // 해당 메서드는 재시도 요청을 하지않음, 재시도 요청은 KafkaListener에서 예외를 발생시켜야 동작
+    // KafkaConfig ErrorHandler 에서 예외 라우팅 필요
+    private void sendToDeadLetterQueue(ConsumerRecord<String, String> record, String cmd, Exception e) {
+        // 별도 스레드에서 DLQ 처리 (응답 지연 방지)
+        CompletableFuture.runAsync(() -> {
+            try {
+                ProducerRecord<String, Object> producer =
+                        new ProducerRecord<>(deadLetterTopic, record.key(), record.value());
+                producer.headers().add("CMD", cmd.getBytes(StandardCharsets.UTF_8));
+                // DLQ로 메시지 전송
+                replyTemplate.send(producer);
+                log.info("Message sent to DLQ: {}", record);
+            } catch (Exception dlqException) {
+                log.error("Failed to send message to DLQ", dlqException);
+            }
+        });
+    }
+
 }

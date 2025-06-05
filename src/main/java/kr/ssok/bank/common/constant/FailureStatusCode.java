@@ -55,6 +55,7 @@ public enum FailureStatusCode implements BaseCode {
     MISSING_WITHDRAW_FOR_DEPOSIT(HttpStatus.BAD_REQUEST, "TRANSFER4007", "해당 트랜잭션 ID에 대한 선출금 기록이 없습니다."),
     TRANSFER_ALREADY_COMPENSATED(HttpStatus.BAD_REQUEST, "TRANSFER4008", "중복된 보상 처리입니다."),
     INVALID_TRANSFER_AMOUNT(HttpStatus.BAD_REQUEST,"TRANSFER4009", "유효하지 않은 이체 금액입니다."),
+    TRANSFER_COMPENSATE_FAILED(HttpStatus.BAD_REQUEST, "TRANSFER4010", "보상 처리에 실패하였습니다."),
 
     //상품 관련 에러
     GOOD_READ_FAILED(HttpStatus.BAD_REQUEST, "GOOD4001", "상품 목록이 존재하지 않습니다."),

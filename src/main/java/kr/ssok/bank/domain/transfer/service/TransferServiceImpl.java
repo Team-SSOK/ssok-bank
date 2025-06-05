@@ -177,7 +177,7 @@ public class TransferServiceImpl implements TransferService{
 
         // 3. 출금 계좌 찾기
         Account account = failedWithdrawal.getAccount();
-        log.info("[보상] 보상 대상 계좌 조회 완료: 계좌번호 = {}", account);
+        log.info("[보상] 보상 대상 계좌 조회 완료: 계좌번호 = {}", account.getAccountNumber());
 
         // 4. 보상 처리 (입금)
         account.deposit(failedWithdrawal.getTransferAmount()); // 실패한 금액을 다시 입금
