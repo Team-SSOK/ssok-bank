@@ -321,7 +321,7 @@
 
 ---
 
-## 11. 잔액 및 송금 한도 검사
+## 12. 잔액 및 송금 한도 검사
 
 - **URL**: `POST /api/bank/account/transferable`
 - **Request Body**
