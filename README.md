@@ -19,6 +19,24 @@ LG CNS Am Inspire Camp 1기 3조 금융팀의 최종 프로젝트 **SSOK BANK** 
 - **이자 지급**: 상품에 적용된 이자율에 맞춰 매일 이자 지급
 ---
 
+## 🏗️ 송금 과정 흐름도
+
+<img width="4922" alt="Group 1489" src="https://github.com/user-attachments/assets/10352f31-a5f7-4482-b14c-175a3a7b449c" />
+
+---
+
+## ⚠️ 보상 트랜잭션
+
+<img width="4114" alt="Group 1490 (1)" src="https://github.com/user-attachments/assets/c85f93f9-9253-4773-b71f-3d8173755f94" />
+
+---
+
+## 🚥 송금 과정 - 동시에 단일 계좌로 입금시
+
+<img width="3717" alt="Group 1491" src="https://github.com/user-attachments/assets/fde96d63-6682-4312-afc0-3f9097e5ec99" />
+
+---
+
 ## 🧱 기술 스택
 
 | 구성 요소           | 설명                       |
